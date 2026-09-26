@@ -1,7 +1,6 @@
 import { addDays, daysBetween, startOfWeek, toKey, weekday } from '../date';
 import { dueDates, isDue, maskFromDays, type Schedule } from '../schedule';
 import { bestStreak, completionRate, currentStreak, dayCompletion, isMilestone, weekProgress, weeklyTotals } from '../stats';
-import { upper } from '../text';
 
 // Fixture week: Monday 2026-09-21 … Sunday 2026-09-27.
 const MON = '2026-09-21';
@@ -191,12 +190,3 @@ describe('milestones', () => {
   });
 });
 
-describe('greek uppercase', () => {
-  it('drops the tonos, keeps dialytika', () => {
-    expect(upper('Όνομα')).toBe('ΟΝΟΜΑ');
-    expect(upper('Εικονίδιο')).toBe('ΕΙΚΟΝΙΔΙΟ');
-    expect(upper('Χρώμα')).toBe('ΧΡΩΜΑ');
-    expect(upper('προΐστασθαι')).toBe('ΠΡΟΪΣΤΑΣΘΑΙ');
-    expect(upper('Your data')).toBe('YOUR DATA');
-  });
-});

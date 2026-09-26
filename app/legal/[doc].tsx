@@ -8,9 +8,9 @@ import { space } from '@/lib/theme';
 
 export default function LegalScreen() {
   const { doc } = useLocalSearchParams<{ doc: string }>();
-  const { language, t } = useApp();
+  const { t } = useApp();
   const id: LegalDocId = doc === 'terms' ? 'terms' : 'privacy';
-  const content = legalDoc(id, language, LEGAL);
+  const content = legalDoc(id, LEGAL);
 
   return (
     <Screen>

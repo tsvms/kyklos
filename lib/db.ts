@@ -1,7 +1,7 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 import type { Backup } from './backup';
 import { toKey, todayKey, type DateKey } from './date';
-import { makeTranslator, type Language } from './i18n';
+import { t } from './i18n';
 import { maskFromDays, type Schedule, type ScheduleType } from './schedule';
 import type { HabitColor } from './theme';
 
@@ -80,9 +80,8 @@ async function addColumn(db: SQLiteDatabase, table: string, column: string, type
   if (!cols.some((c) => c.name === column)) await db.execAsync(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
 }
 
-/** First launch only: three gentle examples, in Greek by default. */
+/** First launch only: three gentle examples. */
 async function seed(db: SQLiteDatabase) {
-  const t = makeTranslator('el');
   const today = todayKey();
   const examples: HabitInput[] = [
     {
@@ -217,7 +216,7 @@ export async function setSetting(db: SQLiteDatabase, key: string, value: string)
 
 // ——— export ———
 
-export async function exportData(db: SQLiteDatabase, appVersion: string, language: Language) {
+export async function exportData(db: SQLiteDatabase, appVersion: string) {
   const [active, archived, checkins] = await Promise.all([
     listHabits(db),
     listHabits(db, { archived: true }),
@@ -226,7 +225,6 @@ export async function exportData(db: SQLiteDatabase, appVersion: string, languag
   return {
     app: 'Kyklos',
     version: appVersion,
-    language,
     exportedAt: new Date().toISOString(),
     exportedOn: toKey(new Date()),
     habits: [...active, ...archived],

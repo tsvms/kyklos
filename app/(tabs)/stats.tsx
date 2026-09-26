@@ -110,7 +110,7 @@ export default function Stats() {
               <RankEmblem rank={r} size={36} locked={locked} />
               <View style={{ flex: 1 }}>
                 <Text variant="label" color={locked ? colors.muted : colors.text} style={{ fontWeight: '700' }}>
-                  {r.name[t.lang]}
+                  {r.name}
                 </Text>
                 <Text variant="caption" muted style={{ fontVariant: ['tabular-nums'] }}>
                   {r.min === 0 ? t('rank.fromStart') : r.min === 1 ? t('rank.fromOne') : t('rank.from', { n: r.min })}

@@ -6,14 +6,12 @@ import { router, useFocusEffect } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useState } from 'react';
-import { Linking, Share, View } from 'react-native';
+import { Alert, Linking, Share, View } from 'react-native';
 import { RingMark } from '@/components/RingMark';
 import { Card, Row, Screen, SectionLabel, Segmented, Text, type IconName } from '@/components/ui';
 import { useApp } from '@/lib/app-state';
-import { alert } from '@/lib/alert';
 import { parseBackup } from '@/lib/backup';
 import { deleteAllData, exportData, restoreBackup } from '@/lib/db';
-import { LANGUAGE_NAMES, type Language } from '@/lib/i18n';
 import { getPermission, requestPermission, type PermissionState } from '@/lib/notifications';
 import { space, withAlpha, type ThemePref } from '@/lib/theme';
 
@@ -21,7 +19,7 @@ const APP_VERSION = Constants.expoConfig?.version ?? '1.0.0';
 
 export default function Settings() {
   const db = useSQLiteContext();
-  const { colors, t, themePref, setThemePref, language, setLanguage, changed, commit, today, notify } = useApp();
+  const { colors, t, themePref, setThemePref, changed, commit, today, notify } = useApp();
   const [permission, setPermission] = useState<PermissionState>('unavailable');
   const [busy, setBusy] = useState(false);
 
@@ -43,7 +41,7 @@ export default function Settings() {
     if (busy) return;
     setBusy(true);
     try {
-      const json = JSON.stringify(await exportData(db, APP_VERSION, language), null, 2);
+      const json = JSON.stringify(await exportData(db, APP_VERSION), null, 2);
       const file = new File(Paths.cache, `kyklos-${today}.json`);
       if (file.exists) file.delete();
       file.create();
@@ -72,7 +70,7 @@ export default function Settings() {
       if (picked.canceled) return;
       const backup = parseBackup(await new File(picked.assets[0].uri).text());
       if (!backup) return notify(t('settings.importInvalid'));
-      alert(
+      Alert.alert(
         t('settings.importTitle'),
         t('settings.importBody', {
           date: backup.exportedOn || '—',
@@ -99,7 +97,7 @@ export default function Settings() {
   };
 
   const onDeleteAll = () => {
-    alert(t('settings.deleteAllTitle'), t('settings.deleteAllBody'), [
+    Alert.alert(t('settings.deleteAllTitle'), t('settings.deleteAllBody'), [
       { text: t('common.cancel'), style: 'cancel' },
       {
         text: t('settings.deleteAllConfirm'),
@@ -116,7 +114,6 @@ export default function Settings() {
     { value: 'light', label: t('settings.light') },
     { value: 'dark', label: t('settings.dark') },
   ];
-  const languageOptions = (Object.keys(LANGUAGE_NAMES) as Language[]).map((l) => ({ value: l, label: LANGUAGE_NAMES[l] }));
 
   return (
     <Screen edgeTop>
@@ -125,8 +122,6 @@ export default function Settings() {
       <SectionLabel>{t('settings.appearance')}</SectionLabel>
       <Segmented options={themeOptions} value={themePref} onChange={setThemePref} />
 
-      <SectionLabel>{t('settings.language')}</SectionLabel>
-      <Segmented options={languageOptions} value={language} onChange={setLanguage} />
 
       {permission !== 'unavailable' && (
         <>

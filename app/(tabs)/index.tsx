@@ -3,14 +3,13 @@ import * as Haptics from 'expo-haptics';
 import { router, useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useEffect, useState } from 'react';
-import { Animated, Easing, Linking, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, Animated, Easing, Linking, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { CheckCircle } from '@/components/CheckCircle';
 import { HabitIcon } from '@/components/HabitIcon';
 import { FlameCount, StreakHero } from '@/components/Streak';
 import { WeekStrip } from '@/components/WeekStrip';
 import { Appear, Button, Card, EmptyState, Screen, SectionLabel, Text } from '@/components/ui';
 import { useApp, useData } from '@/lib/app-state';
-import { alert } from '@/lib/alert';
 import { fromKey, type DateKey } from '@/lib/date';
 import { deleteHabit, groupCheckins, listCheckins, listHabits, setArchived, setCount, type Habit } from '@/lib/db';
 import { greeting, longDate, scheduleSummary, weekdayName } from '@/lib/format';
@@ -100,7 +99,7 @@ export default function Today() {
       const fireAfter = dailyStreak(data.habits, after, today).count;
       const streak = currentStreak(h, after.get(h.id)!, today);
       const dayDone = completed + 1 === due.length && due.includes(h);
-      if (rankedUp(fire.count, fireAfter)) notify(t('rank.up', { rank: rankFor(fireAfter).name[t.lang] }));
+      if (rankedUp(fire.count, fireAfter)) notify(t('rank.up', { rank: rankFor(fireAfter).name }));
       else if (isMilestone(streak)) notify(t(MILESTONE_KEYS[streak] ?? 'milestone.generic', { n: streak }));
       else if (dayDone) notify(t('today.allDone'));
     }
@@ -115,7 +114,7 @@ export default function Today() {
   };
 
   const confirmDelete = (h: Habit) => {
-    alert(t('detail.deleteTitle'), `${h.name}\n\n${t('detail.deleteBody')}`, [
+    Alert.alert(t('detail.deleteTitle'), `${h.name}\n\n${t('detail.deleteBody')}`, [
       { text: t('common.cancel'), style: 'cancel' },
       { text: t('common.archive'), onPress: () => commit(() => setArchived(db, h.id, true)) },
       { text: t('common.delete'), style: 'destructive', onPress: () => commit(() => deleteHabit(db, h.id)) },
@@ -125,7 +124,7 @@ export default function Today() {
   // Android shows at most three alert buttons: edit, delete (which offers archive), cancel.
   const showActions = (h: Habit) => {
     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
-    alert(h.name, undefined, [
+    Alert.alert(h.name, undefined, [
       { text: t('common.cancel'), style: 'cancel' },
       { text: t('common.delete'), style: 'destructive', onPress: () => confirmDelete(h) },
       { text: t('common.edit'), onPress: () => editHabit(h.id) },

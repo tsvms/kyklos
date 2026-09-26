@@ -1,13 +1,12 @@
 import Feather from '@expo/vector-icons/Feather';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import { HabitIcon } from '@/components/HabitIcon';
 import { Heatmap } from '@/components/Heatmap';
 import { StreakHero } from '@/components/Streak';
 import { Button, Card, EmptyState, Screen, Text } from '@/components/ui';
 import { useApp, useData } from '@/lib/app-state';
-import { alert } from '@/lib/alert';
 import { deleteHabit, getHabit, listCheckins, setArchived } from '@/lib/db';
 import { scheduleSummary } from '@/lib/format';
 import { isDue } from '@/lib/schedule';
@@ -45,7 +44,7 @@ export default function HabitDetail() {
   const toggleArchive = () => commit(() => setArchived(db, habit.id, !archived));
 
   const confirmDelete = () => {
-    alert(t('detail.deleteTitle'), t('detail.deleteBody'), [
+    Alert.alert(t('detail.deleteTitle'), t('detail.deleteBody'), [
       { text: t('common.cancel'), style: 'cancel' },
       ...(archived ? [] : [{ text: t('common.archive'), onPress: toggleArchive }]),
       {

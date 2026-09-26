@@ -16,7 +16,6 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '@/lib/app-state';
-import { upper } from '@/lib/text';
 import { hairline, radius, space, TAB_BAR_GAP, TAB_BAR_HEIGHT, type } from '@/lib/theme';
 import { RingMark } from './RingMark';
 
@@ -25,7 +24,7 @@ export type IconName = ComponentProps<typeof Feather>['name'];
 type Variant = keyof typeof type;
 
 // Android clips glyphs that hang left of the first character when a line is
-// ellipsized (numberOfLines), so the tonos of a leading Έ/Ή/Ί… vanishes. A thin space in front gives it
+// ellipsized (numberOfLines), so the tonos of a leading Έ/Ή/Ί… in a habit name vanishes. A thin space in front gives it
 // room; a negative margin of the same width keeps the text where it was.
 const TONOS_CAPS = /^[ΆΈΉΊΌΎΏ]/;
 const THIN_SPACE_EM = 0.2;
@@ -94,11 +93,11 @@ export function Card({ children, style }: { children: ReactNode; style?: StylePr
   );
 }
 
-/** Small all-caps label. Greek caps drop the tonos (ΟΝΟΜΑ, not ΌΝΟΜΑ). */
+/** Small all-caps label. */
 export function SectionLabel({ children, style }: { children: string; style?: StyleProp<TextStyle> }) {
   return (
     <Text variant="caption" muted style={[styles.section, style]} accessibilityRole="header">
-      {upper(children)}
+      {children.toUpperCase()}
     </Text>
   );
 }

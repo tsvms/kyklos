@@ -69,11 +69,11 @@ export function RankPill({ rank, onHero, style }: { rank: Rank; onHero?: boolean
         style,
       ]}
       accessible
-      accessibilityLabel={`${t('rank.label')}: ${rank.name[t.lang]}`}
+      accessibilityLabel={`${t('rank.label')}: ${rank.name}`}
     >
       <RankEmblem rank={rank} size={24} />
       <Text variant="caption" color={onHero ? colors.heroText : colors.text} style={{ fontWeight: '700' }}>
-        {rank.name[t.lang]}
+        {rank.name}
       </Text>
     </View>
   );
@@ -116,7 +116,7 @@ export function RankProgress({ streak, onHero }: { streak: number; onHero?: bool
         </Animated.View>
       </View>
       <Text variant="caption" color={onHero ? colors.heroMuted : colors.muted} style={{ fontVariant: ['tabular-nums'] }}>
-        {next ? t('rank.next', { n: toGo, rank: next.name[t.lang] }) : t('rank.max')}
+        {next ? t('rank.next', { n: toGo, rank: next.name }) : t('rank.max')}
       </Text>
     </View>
   );
@@ -165,7 +165,7 @@ export function StreakHero({
         borderColor: state === 'out' ? colors.border : colors.heroBorder,
       }}
       accessible
-      accessibilityLabel={`${count} ${unit}. ${rank.name[t.lang]}. ${caption}`}
+      accessibilityLabel={`${count} ${unit}. ${rank.name}. ${caption}`}
     >
       {state !== 'out' && <HeroGlow strength={scheme === 'dark' ? 0.32 : 0.22} />}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>

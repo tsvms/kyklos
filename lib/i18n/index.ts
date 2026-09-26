@@ -1,5 +1,4 @@
-// Every user-facing string lives here. Greek is the primary UI language;
-// any key missing from `el` falls back to English.
+// Every user-facing string lives here. Kyklos is English-only.
 
 const en = {
   'tabs.today': 'Today',
@@ -84,7 +83,6 @@ const en = {
   'settings.system': 'System',
   'settings.light': 'Light',
   'settings.dark': 'Dark',
-  'settings.language': 'Language',
   'settings.notifications': 'Reminders',
   'settings.notifOn': 'On',
   'settings.notifOff': 'Off',
@@ -195,228 +193,29 @@ const en = {
 
 export type StringKey = keyof typeof en;
 
-const el: Partial<Record<StringKey, string>> = {
-  'tabs.today': 'Σήμερα',
-  'tabs.stats': 'Στατιστικά',
-  'tabs.settings': 'Ρυθμίσεις',
-
-  'common.save': 'Αποθήκευση',
-  'common.cancel': 'Άκυρο',
-  'common.delete': 'Διαγραφή',
-  'common.edit': 'Επεξεργασία',
-  'common.archive': 'Αρχειοθέτηση',
-  'common.unarchive': 'Επαναφορά',
-  'common.newHabit': 'Νέα συνήθεια',
-
-  'today.morning': 'Καλημέρα',
-  'today.afternoon': 'Καλό απόγευμα',
-  'today.evening': 'Καλησπέρα',
-  'today.allDone': 'Όλα έγιναν για σήμερα. Ξεκουράσου.',
-  'today.emptyTitle': 'Ξεκίνα με κάτι μικρό',
-  'today.emptyBody': 'Μία συνήθεια αρκεί. Τα μικρά βήματα κλείνουν κύκλους.',
-  'today.freeTitle': 'Ελεύθερη μέρα',
-  'today.freeBody': 'Τίποτα προγραμματισμένο για σήμερα. Απόλαυσέ το.',
-  'today.weekProgress': '{done}/{target} αυτή την εβδομάδα',
-  'today.perDayProgress': '{done} από {total} σήμερα',
-  'today.countA11y': '{name}: {done} από {total}. Πάτα για να προσθέσεις ένα, κράτα για να αφαιρέσεις.',
-  'today.markDone': 'Ολοκλήρωση: {name}',
-  'today.markUndone': 'Αναίρεση: {name}',
-
-  'notif.offTitle': 'Οι υπενθυμίσεις είναι κλειστές',
-  'notif.offBody': 'Άνοιξέ τες και θα σου θυμίζουμε, ευγενικά.',
-  'notif.enable': 'Ενεργοποίηση',
-  'notif.openSettings': 'Άνοιγμα ρυθμίσεων',
-  'notif.deniedHint': 'Οι ειδοποιήσεις είναι μπλοκαρισμένες. Μπορείς να τις επιτρέψεις από τις ρυθμίσεις συστήματος.',
-  'notif.channel': 'Υπενθυμίσεις',
-  'notif.body': 'Μια μικρή στιγμή για σένα.',
-  'notif.explain':
-    'Το Kyklos στέλνει μία ήσυχη τοπική υπενθύμιση ανά συνήθεια, την ώρα που διαλέγεις. Τίποτα δεν φεύγει από το κινητό σου.',
-
-  'form.newTitle': 'Νέα συνήθεια',
-  'form.editTitle': 'Επεξεργασία',
-  'form.name': 'Όνομα',
-  'form.namePlaceholder': 'π.χ. Διάβασμα',
-  'form.icon': 'Εικονίδιο',
-  'form.color': 'Χρώμα',
-  'form.schedule': 'Πρόγραμμα',
-  'form.reminder': 'Υπενθύμιση',
-  'form.reminderOn': 'Θύμισέ μου',
-  'form.hour': 'Ώρα',
-  'form.minute': 'Λεπτά',
-  'form.nameRequired': 'Δώσε ένα όνομα',
-  'form.dayRequired': 'Διάλεξε τουλάχιστον μία μέρα',
-  'form.timesPerWeek': 'Φορές την εβδομάδα',
-  'form.perDay': 'Φορές την ημέρα',
-  'form.perDayHint': 'Για πράγματα όπως ποτήρια νερό. Κάθε πάτημα στον κύκλο μετράει ένα· κράτα τον πατημένο για να αφαιρέσεις.',
-  'form.everyNDays': 'Κάθε πόσες μέρες',
-
-  'schedule.daily': 'Κάθε μέρα',
-  'schedule.weekly': 'Φορές τη βδομάδα',
-  'schedule.weekdays': 'Συγκεκριμένες μέρες',
-  'schedule.interval': 'Κάθε Ν μέρες',
-  'schedule.weeklySummary': '{n}× την εβδομάδα',
-  'schedule.perDay': '{n}× την ημέρα',
-  'schedule.intervalSummary': 'Κάθε {n} μέρες',
-
-  'detail.rate': 'Ποσοστό 30 ημ.',
-  'detail.history': 'Τελευταίες 17 εβδομάδες',
-  'detail.archived': 'Σε αρχείο — το ιστορικό μένει, χωρίς υπενθυμίσεις.',
-  'detail.deleteTitle': 'Διαγραφή συνήθειας;',
-  'detail.deleteBody': 'Θα χαθεί και το ιστορικό της. Αν θέλεις να το κρατήσεις, κάνε αρχειοθέτηση.',
-  'detail.notFound': 'Αυτή η συνήθεια δεν υπάρχει πια.',
-  'detail.legendDone': 'Έγινε',
-  'detail.legendMissed': 'Ανοιχτό',
-  'detail.checkins': '{n} ολοκληρώσεις',
-
-  'stats.thisWeek': 'Αυτή την εβδομάδα',
-  'stats.weeks': 'Τελευταίες 8 εβδομάδες',
-  'stats.habits': 'Οι συνήθειές σου',
-  'stats.emptyTitle': 'Τα στατιστικά μεγαλώνουν μαζί σου',
-  'stats.emptyBody': 'Ολοκλήρωσε μία συνήθεια σήμερα και η πρώτη μπάρα θα εμφανιστεί εδώ.',
-
-  'settings.appearance': 'Εμφάνιση',
-  'settings.system': 'Σύστημα',
-  'settings.light': 'Φωτεινό',
-  'settings.dark': 'Σκοτεινό',
-  'settings.language': 'Γλώσσα',
-  'settings.notifications': 'Υπενθυμίσεις',
-  'settings.notifOn': 'Ενεργές',
-  'settings.notifOff': 'Κλειστές',
-  'settings.data': 'Τα δεδομένα σου',
-  'settings.export': 'Εξαγωγή δεδομένων (JSON)',
-  'settings.exportHint': 'Πλήρες αντίγραφο των συνηθειών και των ολοκληρώσεων.',
-  'settings.exportFailed': 'Η εξαγωγή δεν πέτυχε αυτή τη φορά. Δοκίμασε ξανά.',
-  'settings.archived': 'Αρχειοθετημένες',
-  'settings.archivedNone': 'Τίποτα στο αρχείο.',
-  'settings.about': 'Σχετικά',
-  'settings.aboutBody':
-    'Το Kyklos είναι ένα ήσυχο εργαλείο για συνήθειες. Χωρίς λογαριασμούς, διαφημίσεις ή παρακολούθηση — όλα μένουν σε αυτή τη συσκευή.',
-  'settings.version': 'Έκδοση {v}',
-
-  'today.backToToday': 'Πίσω στο σήμερα',
-  'today.pastHint': 'Ξέχασες να το σημειώσεις; Μπορείς να συμπληρώσεις οποιαδήποτε από τις τελευταίες 7 μέρες.',
-  'today.streakKeep': '{n} στη σειρά · συνέχισέ το σήμερα',
-  'today.dayA11y': '{date}: {done} από {total}',
-  'today.restDay': 'Τίποτα δεν ήταν προγραμματισμένο αυτή τη μέρα.',
-
-  'milestone.3': 'Τρεις στη σειρά. Ο κύκλος ξεκίνησε.',
-  'milestone.7': 'Μια ολόκληρη εβδομάδα. Ωραίος ρυθμός.',
-  'milestone.14': 'Δύο εβδομάδες. Γίνεται δικό σου.',
-  'milestone.21': 'Τρεις εβδομάδες συνέπειας.',
-  'milestone.30': 'Ένας μήνας από μικρά βήματα.',
-  'milestone.100': 'Εκατό. Αθόρυβα αξιοσημείωτο.',
-  'milestone.365': 'Ένας ολόκληρος χρόνος. Ευχαριστούμε που είσαι εδώ.',
-  'milestone.generic': '{n} στη σειρά. Μπράβο σου.',
-
-  'streak.best': 'Καλύτερο: {n}',
-
-  'detail.total': 'Ολοκληρώσεις',
-  'detail.editA11y': 'Επεξεργασία συνήθειας',
-
-  'schedule.dailyHint': 'Όλες τις μέρες',
-  'schedule.weekdaysHint': 'Εσύ διαλέγεις μέρες',
-  'schedule.weeklyHint': 'Όποιες μέρες, Χ φορές',
-  'schedule.intervalHint': 'Κάθε 2, 3… μέρες',
-
-  'stats.rate30': 'Ποσοστό 30 ημερών',
-
-  'settings.privacyShort': 'Χωρίς λογαριασμούς. Χωρίς παρακολούθηση. Τα δεδομένα σου μένουν στο κινητό.',
-  'settings.import': 'Επαναφορά από αντίγραφο',
-  'settings.importHint': 'Αντικαθιστά ό,τι υπάρχει στο κινητό με ένα αντίγραφο JSON του Kyklos.',
-  'settings.importTitle': 'Αντικατάσταση όλων;',
-  'settings.importBody':
-    'Το αντίγραφο ({date}) έχει {habits} συνήθειες και {checkins} ολοκληρώσεις. Ό,τι υπάρχει τώρα στο κινητό θα αντικατασταθεί.',
-  'settings.importConfirm': 'Αντικατάσταση',
-  'settings.importDone': 'Η επαναφορά ολοκληρώθηκε. Καλώς ήρθες πίσω.',
-  'settings.importInvalid': 'Αυτό το αρχείο δεν μοιάζει με αντίγραφο του Kyklos, οπότε δεν άλλαξε τίποτα.',
-  'settings.deleteAll': 'Διαγραφή όλων των δεδομένων',
-  'settings.deleteAllHint': 'Αφαιρεί κάθε συνήθεια και ολοκλήρωση από αυτό το κινητό.',
-  'settings.deleteAllTitle': 'Διαγραφή όλων;',
-  'settings.deleteAllBody':
-    'Όλες οι συνήθειες και το ιστορικό τους θα διαγραφούν οριστικά από αυτό το κινητό. Ίσως θέλεις πρώτα να κάνεις εξαγωγή αντιγράφου.',
-  'settings.deleteAllConfirm': 'Διαγραφή όλων',
-  'settings.deleted': 'Όλα διαγράφηκαν. Μια καινούργια αρχή.',
-  'settings.legal': 'Νομικά',
-  'settings.privacy': 'Πολιτική απορρήτου',
-  'settings.terms': 'Όροι χρήσης',
-  'settings.licenses': 'Άδειες ανοιχτού λογισμικού',
-
-  'legal.updated': 'Ισχύει από {date}',
-  'licenses.intro': 'Το Kyklos βασίζεται σε αυτά τα έργα ανοιχτού λογισμικού. Ευχαριστούμε τους δημιουργούς τους.',
-
-  'error.title': 'Κάτι δεν άνοιξε σωστά',
-  'error.body': 'Κλείσε εντελώς το Kyklos και άνοιξέ το ξανά. Αν επαναληφθεί, συνήθως βοηθά μια επανεκκίνηση του κινητού.',
-  'error.retry': 'Δοκίμασε ξανά',
-
-  'seed.read': 'Διάβασμα',
-  'seed.water': 'Πιες νερό',
-  'seed.walk': 'Περπάτημα',
-
-  'streak.unit': 'μέρες σερί',
-  'streak.unitOne': 'μέρα σερί',
-  'streak.habitUnit': 'στη σειρά',
-  'streak.lit': 'Η φωτιά καίει. Τα λέμε αύριο.',
-  'streak.waiting': 'Ολοκλήρωσε μία συνήθεια σήμερα για να μη σβήσει η φωτιά.',
-  'streak.out': 'Η φωτιά έσβησε. Μία συνήθεια σήμερα την ανάβει ξανά.',
-  'streak.habitLit': 'Έγινε σήμερα. Η φωτιά καίει.',
-  'streak.habitWaiting': 'Κάν’ το σήμερα για να συνεχίσει η φωτιά.',
-  'streak.habitOut': 'Καμία φωτιά ακόμα. Ολοκλήρωσέ το για να ανάψει.',
-
-  'rank.label': 'Βαθμίδα',
-  'rank.title': 'Βαθμίδες',
-  'rank.intro': 'Κράτα τη φωτιά αναμμένη κάθε μέρα για να ανεβαίνεις. Το καλύτερό σου σερί ξεκλειδώνει κάθε βαθμίδα για πάντα.',
-  'rank.next': 'Ακόμα {n} για {rank}',
-  'rank.max': 'Κορυφαία βαθμίδα. Θρύλος.',
-  'rank.from': 'από {n} μέρες',
-  'rank.fromOne': 'από την 1η μέρα',
-  'rank.fromStart': 'εκεί που ξεκινά κάθε φωτιά',
-  'rank.up': 'Νέα βαθμίδα: {rank}',
-  'rank.now': 'Τώρα',
-
-  'today.edit': 'Επεξεργασία',
-  'today.editDone': 'Τέλος',
-  'today.editHint': 'Πάτα μια συνήθεια για επεξεργασία ή τον κάδο για διαγραφή.',
-  'today.addHabit': 'Προσθήκη συνήθειας',
-  'today.listTitle': 'Σήμερα',
-  'today.doneOf': '{done} από {total}',
-  'today.saveFailed': 'Δεν αποθηκεύτηκε. Δοκίμασε ξανά.',
-  'today.deleteA11y': 'Διαγραφή: {name}',
-  'today.actionsHint': 'Κράτα πατημένο για περισσότερα',
-
-  'stats.streak': 'Σερί ημερών',
-  'stats.bestStreak': 'Καλύτερο σερί',
-};
-
-export type Language = 'el' | 'en';
-
-const tables: Record<Language, Partial<Record<StringKey, string>>> = { el, en };
 
 // Weekday labels indexed like Date#getDay (0 = Sunday).
-const weekdaysShort: Record<Language, string[]> = {
-  el: ['Κυ', 'Δε', 'Τρ', 'Τε', 'Πε', 'Πα', 'Σα'],
-  en: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
-};
-
-export const LANGUAGE_NAMES: Record<Language, string> = { el: 'Ελληνικά', en: 'English' };
+const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
 export type Translator = ((key: StringKey, vars?: Record<string, string | number>) => string) & {
-  lang: Language;
   weekday: (day: number) => string;
+  /** Dates read "Saturday 26 September" with a 24-hour clock. */
   locale: string;
 };
 
-export function makeTranslator(lang: Language): Translator {
-  const table = tables[lang];
+export function makeTranslator(): Translator {
   const t = ((key, vars) => {
-    let s: string = table[key] ?? en[key] ?? key;
+    let s: string = en[key] ?? key;
     if (vars) for (const [k, v] of Object.entries(vars)) s = s.replaceAll(`{${k}}`, String(v));
     return s;
   }) as Translator;
-  t.lang = lang;
-  t.weekday = (day) => weekdaysShort[lang][day];
-  t.locale = lang === 'el' ? 'el-GR' : 'en-GB';
+  t.weekday = (day) => WEEKDAYS[day];
+  t.locale = 'en-GB';
   return t;
 }
+
+/** The app's one translator. */
+export const t = makeTranslator();
 
 // ——— Legal documents ———
 // Written to describe exactly what the app does. Keep in sync with the code:
@@ -434,80 +233,16 @@ export interface LegalFacts {
   effectiveDate: string;
 }
 
-function contactLine(lang: Language, f: LegalFacts): string {
-  if (f.contactEmail) {
-    return lang === 'el'
-      ? `Για οποιαδήποτε ερώτηση ή αίτημα σχετικά με το απόρρητο, γράψε μας στο ${f.contactEmail}.`
-      : `For any privacy question or request, write to ${f.contactEmail}.`;
-  }
-  return lang === 'el'
-    ? 'Για οποιαδήποτε ερώτηση ή αίτημα, χρησιμοποίησε τα στοιχεία επικοινωνίας του προγραμματιστή στη σελίδα του Kyklos στο App Store ή στο Google Play.'
-    : 'For any question or request, use the developer contact details on the Kyklos page in the App Store or Google Play.';
+function contactLine(f: LegalFacts): string {
+  if (f.contactEmail) return `For any privacy question or request, write to ${f.contactEmail}.`;
+  return 'For any question or request, use the developer contact details on the Kyklos page in the App Store or Google Play.';
 }
 
-export function legalDoc(id: LegalDocId, lang: Language, f: LegalFacts): LegalDoc {
-  const el = lang === 'el';
+export function legalDoc(id: LegalDocId, f: LegalFacts): LegalDoc {
   const who = f.publisher;
 
   if (id === 'privacy') {
-    return el
-      ? {
-          title: 'Πολιτική απορρήτου',
-          sections: [
-            {
-              heading: 'Με μια ματιά',
-              body: [
-                'Το Kyklos δεν συλλέγει, δεν αποστέλλει και δεν πουλά κανένα δεδομένο. Δεν υπάρχουν λογαριασμοί, διαφημίσεις, analytics ή παρακολούθηση. Ό,τι γράφεις μένει στο κινητό σου.',
-              ],
-            },
-            { heading: 'Ποιος είναι υπεύθυνος', body: [`Το Kyklos διατίθεται από: ${who}. ${contactLine(lang, f)}`] },
-            {
-              heading: 'Ποια δεδομένα υπάρχουν και πού',
-              body: [
-                'Τα ονόματα, τα εικονίδια, τα χρώματα και τα προγράμματα των συνηθειών σου, οι ώρες υπενθύμισης, οι ημερομηνίες που ολοκλήρωσες κάθε συνήθεια και οι προτιμήσεις σου (θέμα, γλώσσα).',
-                'Όλα αποθηκεύονται μόνο τοπικά, σε μια βάση δεδομένων μέσα στην εφαρμογή, στη συσκευή σου. Η εφαρμογή δεν κάνει καμία σύνδεση στο διαδίκτυο και δεν έχουμε καμία πρόσβαση σε αυτά.',
-              ],
-            },
-            {
-              heading: 'Υπενθυμίσεις και άδειες',
-              body: [
-                'Οι υπενθυμίσεις είναι τοπικές ειδοποιήσεις που προγραμματίζει το ίδιο το κινητό σου. Δεν περνούν από κανέναν διακομιστή.',
-                'Ζητάμε μόνο ό,τι χρειάζεται: ειδοποιήσεις (για τις υπενθυμίσεις), ακριβή ξυπνητήρια (για να έρχονται στην ώρα τους), δόνηση, και ενημέρωση μετά την εκκίνηση της συσκευής (για να επανέρχονται οι υπενθυμίσεις μετά από επανεκκίνηση). Μπορείς να τις αρνηθείς· η εφαρμογή λειτουργεί κανονικά και χωρίς υπενθυμίσεις.',
-              ],
-            },
-            {
-              heading: 'Αντίγραφα ασφαλείας',
-              body: [
-                'Όταν κάνεις «Εξαγωγή δεδομένων», δημιουργείται ένα αρχείο JSON που μοιράζεσαι εσύ, όπου εσύ επιλέξεις. Από εκεί και πέρα ισχύουν οι όροι της υπηρεσίας που διάλεξες.',
-                'Αν έχεις ενεργοποιήσει αντίγραφα ασφαλείας συστήματος (iCloud ή Google), το λειτουργικό σου μπορεί να συμπεριλάβει σε αυτά τα δεδομένα της εφαρμογής, σύμφωνα με τις δικές σου ρυθμίσεις και τις πολιτικές της Apple ή της Google.',
-              ],
-            },
-            {
-              heading: 'Διαγνωστικά καταστημάτων',
-              body: [
-                'Αν έχεις επιλέξει να μοιράζεσαι διαγνωστικά με την Apple ή τη Google, αυτές μπορεί να μας δείξουν ανώνυμες αναφορές σφαλμάτων, σύμφωνα με τις δικές τους πολιτικές. Δεν περιέχουν τις συνήθειές σου.',
-              ],
-            },
-            {
-              heading: 'Τα δικαιώματά σου (ΓΚΠΔ)',
-              body: [
-                'Επειδή δεν λαμβάνουμε δεδομένα σου, τα ελέγχεις πλήρως εσύ: πρόσβαση και φορητότητα με την «Εξαγωγή δεδομένων», διόρθωση με την «Επεξεργασία», διαγραφή με τη «Διαγραφή όλων των δεδομένων» ή με την απεγκατάσταση της εφαρμογής.',
-                'Έχεις πάντα δικαίωμα να υποβάλεις καταγγελία στην Αρχή Προστασίας Δεδομένων Προσωπικού Χαρακτήρα (www.dpa.gr) ή στην αρμόδια αρχή της χώρας σου.',
-              ],
-            },
-            {
-              heading: 'Παιδιά',
-              body: ['Το Kyklos δεν απευθύνεται ειδικά σε παιδιά και δεν συλλέγει δεδομένα από κανέναν, οποιασδήποτε ηλικίας.'],
-            },
-            {
-              heading: 'Αλλαγές',
-              body: [
-                `Αν αλλάξει αυτή η πολιτική, η νέα έκδοση θα εμφανίζεται εδώ με νέα ημερομηνία ισχύος. Τρέχουσα έκδοση: ${f.effectiveDate}.`,
-              ],
-            },
-          ],
-        }
-      : {
+    return {
           title: 'Privacy policy',
           sections: [
             {
@@ -516,11 +251,11 @@ export function legalDoc(id: LegalDocId, lang: Language, f: LegalFacts): LegalDo
                 'Kyklos does not collect, transmit or sell any data. There are no accounts, ads, analytics or tracking. What you write stays on your phone.',
               ],
             },
-            { heading: 'Who is responsible', body: [`Kyklos is provided by: ${who}. ${contactLine(lang, f)}`] },
+            { heading: 'Who is responsible', body: [`Kyklos is provided by: ${who}. ${contactLine(f)}`] },
             {
               heading: 'What data exists and where',
               body: [
-                'Your habit names, icons, colours and schedules, reminder times, the dates you completed each habit, and your preferences (theme, language).',
+                'Your habit names, icons, colours and schedules, reminder times, the dates you completed each habit, and your theme preference.',
                 'All of it is stored only locally, in a database inside the app on your device. The app makes no internet connections and we have no access to it.',
               ],
             },
@@ -565,60 +300,7 @@ export function legalDoc(id: LegalDocId, lang: Language, f: LegalFacts): LegalDo
         };
   }
 
-  return el
-    ? {
-        title: 'Όροι χρήσης',
-        sections: [
-          {
-            heading: 'Συμφωνία',
-            body: [
-              `Χρησιμοποιώντας το Kyklos αποδέχεσαι αυτούς τους όρους. Η εφαρμογή διατίθεται από: ${who}. Αν την κατέβασες από το App Store, ισχύει επιπλέον η Τυπική Άδεια Χρήσης Τελικού Χρήστη (EULA) της Apple.`,
-            ],
-          },
-          {
-            heading: 'Άδεια χρήσης',
-            body: [
-              'Σου παρέχουμε προσωπική, μη αποκλειστική, μη μεταβιβάσιμη άδεια να χρησιμοποιείς την εφαρμογή στις συσκευές σου. Το όνομα, το λογότυπο και ο σχεδιασμός του Kyklos παραμένουν ιδιοκτησία του δημιουργού του.',
-            ],
-          },
-          {
-            heading: 'Όχι ιατρική συμβουλή',
-            body: [
-              'Το Kyklos είναι εργαλείο οργάνωσης συνηθειών. Δεν παρέχει ιατρική, ψυχολογική ή διατροφική συμβουλή και δεν υποκαθιστά επαγγελματία υγείας. Για θέματα υγείας απευθύνσου σε ειδικό.',
-            ],
-          },
-          {
-            heading: 'Τα δεδομένα σου',
-            body: [
-              'Τα δεδομένα ζουν μόνο στη συσκευή σου. Αν τη χάσεις, την επαναφέρεις ή απεγκαταστήσεις την εφαρμογή χωρίς αντίγραφο, τα δεδομένα χάνονται και δεν μπορούμε να τα ανακτήσουμε. Σου προτείνουμε να κάνεις κατά διαστήματα «Εξαγωγή δεδομένων».',
-            ],
-          },
-          {
-            heading: 'Υπενθυμίσεις',
-            body: [
-              'Οι υπενθυμίσεις εξαρτώνται από το λειτουργικό σύστημα, τις άδειες και τις ρυθμίσεις εξοικονόμησης μπαταρίας. Μπορεί να καθυστερήσουν ή να μην εμφανιστούν· μη βασίζεσαι σε αυτές για κάτι κρίσιμο, όπως φάρμακα.',
-            ],
-          },
-          {
-            heading: 'Εγγυήσεις και ευθύνη',
-            body: [
-              'Η εφαρμογή παρέχεται «ως έχει». Στον βαθμό που επιτρέπει ο νόμος, δεν ευθυνόμαστε για έμμεσες ζημίες ή απώλεια δεδομένων από τη χρήση της.',
-              'Τίποτα σε αυτούς τους όρους δεν περιορίζει τα δικαιώματα που σου δίνει η υποχρεωτική νομοθεσία προστασίας καταναλωτή της Ελλάδας ή της Ευρωπαϊκής Ένωσης.',
-            ],
-          },
-          {
-            heading: 'Εφαρμοστέο δίκαιο',
-            body: [
-              'Οι όροι διέπονται από το ελληνικό δίκαιο. Αν είσαι καταναλωτής, διατηρείς την προστασία των υποχρεωτικών διατάξεων της χώρας διαμονής σου.',
-            ],
-          },
-          {
-            heading: 'Αλλαγές και επικοινωνία',
-            body: [`Μπορεί να ενημερώσουμε τους όρους σε νέες εκδόσεις. Τρέχουσα έκδοση: ${f.effectiveDate}.`, contactLine(lang, f)],
-          },
-        ],
-      }
-    : {
+  return {
         title: 'Terms of use',
         sections: [
           {
@@ -666,7 +348,7 @@ export function legalDoc(id: LegalDocId, lang: Language, f: LegalFacts): LegalDo
           },
           {
             heading: 'Changes and contact',
-            body: [`We may update these terms in new versions. Current version: ${f.effectiveDate}.`, contactLine(lang, f)],
+            body: [`We may update these terms in new versions. Current version: ${f.effectiveDate}.`, contactLine(f)],
           },
         ],
       };

@@ -20,20 +20,20 @@ export interface Rank {
   min: number;
   /** Emblem colour. */
   color: string;
-  name: { el: string; en: string };
+  name: string;
 }
 
 export const RANKS: readonly Rank[] = [
-  { id: 'coal', min: 0, color: '#8C857B', name: { el: 'Κάρβουνο', en: 'Coal' } },
-  { id: 'spark', min: 1, color: '#F2A541', name: { el: 'Σπίθα', en: 'Spark' } },
-  { id: 'flame', min: 3, color: '#FF8A3D', name: { el: 'Φλόγα', en: 'Flame' } },
-  { id: 'blaze', min: 7, color: '#FF6A2B', name: { el: 'Φωτιά', en: 'Blaze' } },
-  { id: 'torch', min: 14, color: '#EF4E2B', name: { el: 'Πυρσός', en: 'Torch' } },
-  { id: 'beacon', min: 30, color: '#E23D4B', name: { el: 'Φάρος', en: 'Beacon' } },
-  { id: 'volcano', min: 60, color: '#C62F5C', name: { el: 'Ηφαίστειο', en: 'Volcano' } },
-  { id: 'phoenix', min: 100, color: '#A43AD1', name: { el: 'Φοίνικας', en: 'Phoenix' } },
-  { id: 'sun', min: 200, color: '#E9A800', name: { el: 'Ήλιος', en: 'Sun' } },
-  { id: 'olympian', min: 365, color: '#2F9BEA', name: { el: 'Ολύμπια Φλόγα', en: 'Olympian' } },
+  { id: 'coal', min: 0, color: '#8C857B', name: 'Coal' },
+  { id: 'spark', min: 1, color: '#F2A541', name: 'Spark' },
+  { id: 'flame', min: 3, color: '#FF8A3D', name: 'Flame' },
+  { id: 'blaze', min: 7, color: '#FF6A2B', name: 'Blaze' },
+  { id: 'torch', min: 14, color: '#EF4E2B', name: 'Torch' },
+  { id: 'beacon', min: 30, color: '#E23D4B', name: 'Beacon' },
+  { id: 'volcano', min: 60, color: '#C62F5C', name: 'Volcano' },
+  { id: 'phoenix', min: 100, color: '#A43AD1', name: 'Phoenix' },
+  { id: 'sun', min: 200, color: '#E9A800', name: 'Sun' },
+  { id: 'olympian', min: 365, color: '#2F9BEA', name: 'Olympian' },
 ];
 
 /** Position of the rank reached with `streak` (0 = Coal). */

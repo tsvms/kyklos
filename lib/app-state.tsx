@@ -5,7 +5,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { AppState, useColorScheme } from 'react-native';
 import { addDays, fromKey, todayKey, type DateKey } from './date';
 import { getSetting, groupCheckins, listCheckins, listHabits, setSetting } from './db';
-import { makeTranslator, type Language, type Translator } from './i18n';
+import { t, type Translator } from './i18n';
 import { syncReminders } from './notifications';
 import { palettes, type Palette, type Scheme, type ThemePref } from './theme';
 
@@ -15,8 +15,6 @@ interface AppCtx {
   colors: Palette;
   themePref: ThemePref;
   setThemePref: (p: ThemePref) => void;
-  language: Language;
-  setLanguage: (l: Language) => void;
   t: Translator;
   /** Bumped after every write; screens reload when it changes. */
   version: number;
@@ -48,26 +46,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const system = useColorScheme();
   const [ready, setReady] = useState(false);
   const [themePref, setThemePrefState] = useState<ThemePref>('system');
-  const [language, setLanguageState] = useState<Language>('el');
   const [version, setVersion] = useState(0);
   const [today, setToday] = useState(todayKey);
   const [toast, setToast] = useState<AppCtx['toast']>(null);
 
   const scheme: Scheme = themePref === 'system' ? (system === 'dark' ? 'dark' : 'light') : themePref;
   const colors = palettes[scheme];
-  const t = useMemo(() => makeTranslator(language), [language]);
 
   useEffect(() => {
     let alive = true;
     (async () => {
-      const [theme, lang] = await Promise.all([getSetting(db, 'theme'), getSetting(db, 'language')]).catch(() => [null, null]);
+      const theme = await getSetting(db, 'theme').catch(() => null);
       if (!alive) return;
       if (theme === 'light' || theme === 'dark' || theme === 'system') setThemePrefState(theme);
-      const resolvedLang: Language = lang === 'en' ? 'en' : 'el';
-      setLanguageState(resolvedLang);
       setReady(true);
       // Kill + reopen: reminders are re-planned from the database every launch.
-      planReminders(db, makeTranslator(resolvedLang));
+      planReminders(db, t);
     })();
     return () => {
       alive = false;
@@ -85,7 +79,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (now === today) return;
       setToday(now);
       setVersion((v) => v + 1);
-      planReminders(db, makeTranslator(language));
+      planReminders(db, t);
     };
     const midnight = fromKey(addDays(today, 1));
     midnight.setHours(0, 0, 1, 0);
@@ -95,7 +89,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       clearTimeout(timer);
       sub.remove();
     };
-  }, [db, language, today]);
+  }, [db, today]);
 
   const notify = useCallback((text: string) => setToast({ id: Date.now(), text }), []);
 
@@ -113,15 +107,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [db],
   );
 
-  const setLanguage = useCallback(
-    (l: Language) => {
-      setLanguageState(l);
-      setSetting(db, 'language', l)
-        .catch((e) => console.warn('[kyklos] could not save language', e))
-        .then(() => planReminders(db, makeTranslator(l)));
-    },
-    [db],
-  );
 
   const changed = useCallback(() => {
     setVersion((v) => v + 1);
@@ -144,8 +129,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo<AppCtx>(
-    () => ({ ready, scheme, colors, themePref, setThemePref, language, setLanguage, t, version, changed, commit, today, toast, notify }),
-    [ready, scheme, colors, themePref, setThemePref, language, setLanguage, t, version, changed, commit, today, toast, notify],
+    () => ({ ready, scheme, colors, themePref, setThemePref, t, version, changed, commit, today, toast, notify }),
+    [ready, scheme, colors, themePref, setThemePref, t, version, changed, commit, today, toast, notify],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -8,10 +8,6 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "backgroundColor": "#F6F3EE",
-    "locales": {
-      "el": "./locales/el.json",
-      "en": "./locales/en.json"
-    },
     "ios": {
       "bundleIdentifier": "com.kyklos.app",
       "supportsTablet": false,
@@ -23,12 +19,7 @@
         "UIBackgroundModes": [
           "remote-notification"
         ],
-        "CFBundleDevelopmentRegion": "el",
-        "CFBundleLocalizations": [
-          "el",
-          "en"
-        ],
-        "CFBundleAllowMixedLocalizations": true
+        "CFBundleDevelopmentRegion": "en"
       },
       "privacyManifests": {
         "NSPrivacyTracking": false,

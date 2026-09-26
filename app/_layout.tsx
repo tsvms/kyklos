@@ -9,7 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Toast } from '@/components/Toast';
 import { AppProvider, useApp } from '@/lib/app-state';
 import { DB_NAME, migrate } from '@/lib/db';
-import { makeTranslator } from '@/lib/i18n';
+import { t } from '@/lib/i18n';
 import { configureNotifications } from '@/lib/notifications';
 import { palettes } from '@/lib/theme';
 
@@ -53,7 +53,6 @@ export default function RootLayout() {
 function OpenError({ onRetry }: { onRetry: () => void }) {
   const scheme = useColorScheme() === 'dark' ? 'dark' : 'light';
   const c = palettes[scheme];
-  const t = makeTranslator('el');
   return (
     <View style={{ flex: 1, backgroundColor: c.bg, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 16 }}>
       <Text style={{ color: c.text, fontSize: 22, fontWeight: '600', textAlign: 'center' }}>{t('error.title')}</Text>
