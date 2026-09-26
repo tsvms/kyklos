@@ -15,7 +15,7 @@ A free, private habit tracker for Android and iOS, with a streak fire and ranks.
 ---
 
 Kyklos is free. It has no accounts, no ads and no tracking, and everything stays on your phone in SQLite.
-It's one Expo codebase (React Native, TypeScript, Expo Router, SDK 57). The name is Kyklos, the slug is `kyklos`, the bundle ID / package is `com.kyklos.app` and the version is 1.1.0.
+It's one Expo codebase (React Native, TypeScript, Expo Router, SDK 57). The name is Kyklos, the slug is `kyklos`, the bundle ID / package is `com.kyklos.app` and the version is 1.2.0.
 
 ## Features
 
@@ -29,6 +29,9 @@ It's one Expo codebase (React Native, TypeScript, Expo Router, SDK 57). The name
 - **Today.** A 7-day strip of mini rings shows each day's progress. Tap a past day to fill in a check-in you forgot. Check-ins give haptics and update instantly.
 - **Schedules.** Every day, X times per week, specific weekdays, or every N days, with an optional local reminder for each habit.
 - **Times a day.** A habit can need several check-ins a day (e.g. 6 glasses of water). Its circle becomes a counter: tap adds one and a ring fills, long-press takes one back. The day counts once the target is reached.
+- **Home-screen widgets.**
+  - Android: *Kyklos streak* (2×2: fire, streak, rank, today's progress) and *Kyklos today* (4×2: today's habits, checked off right from the home screen). They follow the system light/dark theme and stay in sync with the app both ways.
+  - iPhone: one *Kyklos* widget in small and medium sizes, showing the same. Tapping opens the app; the widget rolls over to the new day at midnight on its own.
 - **Habit detail.** Streak hero, 30-day rate, total check-ins, a 17-week heatmap, and Edit / Archive (keeps the history) / Delete.
 - **Stats.** Day streak, best streak, this week, 30-day rate, 8 weekly bars, the fire for each habit, and the rank ladder.
 - **Settings.**
@@ -75,6 +78,8 @@ lib/
   db.ts                  expo-sqlite schema, migration, seed, queries, export
   notifications.ts       permission + reminder planning
   i18n/index.ts          every user-facing string (English)
+  widget-data.ts         what the widgets show — pure, tested
+widget/                  home-screen widgets: android/ (react-native-android-widget), ios/ (expo-widgets)
   theme.ts               palette, 8 habit colours, radii, type scale
   __tests__/             Jest unit tests
 scripts/generate-assets.mjs   draws the icon / splash / notification icon (no downloads)

@@ -5,6 +5,7 @@ import { Animated, Easing, Platform, Pressable, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { useApp } from '@/lib/app-state';
 import { FLAME } from '@/lib/theme';
+import { nextCount } from '@/lib/widget-data';
 import { Text } from './ui';
 
 const SIZE = 32;
@@ -68,7 +69,7 @@ export function CheckCircle({
     onChange(next);
   };
 
-  const increment = () => change(done ? target - 1 : count + 1);
+  const increment = () => change(nextCount(count, target));
   const decrement = () => count > 0 && change(count - 1);
 
   const emberOpacity = burst.interpolate({ inputRange: [0, 0.1, 0.6, 1], outputRange: [0, 1, 0.8, 0] });

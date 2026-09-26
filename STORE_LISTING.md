@@ -107,7 +107,7 @@ All data is local SQLite.
 | --- | --- |
 | App icon 512×512 | `store/icon-512.png` |
 | Feature graphic 1024×500 | `store/feature-graphic.png` |
-| Phone screenshots (2–8) | `store/screenshot-1.png` … `store/screenshot-5.png` (1080×1920) |
+| Phone screenshots (2–8) | `store/screenshot-1.png` … `store/screenshot-6.png` (1080×1920) |
 
 ### 2.5 Release — νέος προσωπικός λογαριασμός
 Οι προσωπικοί λογαριασμοί (μετά τον Νοέμβριο 2023) πρέπει να κάνουν πρώτα **closed test με τουλάχιστον 12 testers για 14 συνεχόμενες μέρες** πριν ζητήσουν Production.
@@ -120,14 +120,14 @@ All data is local SQLite.
 **Release notes (en-US)**
 ```
 <en-US>
-• New: "X times a day" — e.g. 6 glasses of water, with a counter that fills up
+• New: home-screen widgets — your streak, and today's habits you can check off right from the home screen
+• "X times a day" habits, e.g. 6 glasses of water
 • Sparks when you complete a habit, livelier animations
-• Stability fixes
 </en-US>
 ```
 
 ### 2.6 Επόμενες ενημερώσεις
-Κάθε νέα έκδοση χρειάζεται μεγαλύτερο `versionCode` (τώρα είναι **1**). Με EAS: `eas build -p android --profile production` (το αυξάνει μόνο του)· αν χρησιμοποιήσεις EAS, ανέβασε πρώτα το ίδιο κλειδί με `eas credentials` ώστε τα APK να αναβαθμίζονται πάνω στα παλιά.
+Κάθε νέα έκδοση χρειάζεται μεγαλύτερο `versionCode` (τώρα είναι **2**, στο `app.json` → `android.versionCode`). Με EAS: `eas build -p android --profile production` (το αυξάνει μόνο του)· αν χρησιμοποιήσεις EAS, ανέβασε πρώτα το ίδιο κλειδί με `eas credentials` ώστε τα APK να αναβαθμίζονται πάνω στα παλιά.
 
 ---
 
@@ -146,6 +146,7 @@ Kyklos helps you build small habits without pressure.
 • 10 ranks, from Spark to Olympian, depending on your streak
 • Flexible schedules: every day, X times a week, specific weekdays or every N days
 • X times a day: e.g. 6 glasses of water, with a counter that fills up
+• Home-screen widgets: see your streak and check off today's habits without opening the app
 • Forgot yesterday? Fill in any of the last 7 days
 • 17-week history, weekly stats, 30-day completion rate
 • One quiet reminder per habit

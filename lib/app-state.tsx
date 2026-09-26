@@ -6,6 +6,7 @@ import { AppState, useColorScheme } from 'react-native';
 import { addDays, fromKey, todayKey, type DateKey } from './date';
 import { getSetting, groupCheckins, listCheckins, listHabits, setSetting } from './db';
 import { t, type Translator } from './i18n';
+import { updateWidgets } from '@/widget';
 import { syncReminders } from './notifications';
 import { palettes, type Palette, type Scheme, type ThemePref } from './theme';
 
@@ -31,14 +32,18 @@ interface AppCtx {
 
 const AppContext = createContext<AppCtx | null>(null);
 
-/** Never throws: a failed re-plan must not take the UI down with it. */
-async function planReminders(db: SQLiteDatabase, t: Translator) {
+/**
+ * Brings everything outside the app in line with the database: reminders and
+ * home-screen widgets. Never throws: a failure here must not take the UI down.
+ */
+async function syncOutside(db: SQLiteDatabase, t: Translator) {
   try {
     const [habits, checkins] = await Promise.all([listHabits(db), listCheckins(db)]);
     await syncReminders(habits, groupCheckins(checkins, habits), t);
   } catch (e) {
     console.warn('[kyklos] could not plan reminders', e);
   }
+  await updateWidgets(db);
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
@@ -60,8 +65,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (!alive) return;
       if (theme === 'light' || theme === 'dark' || theme === 'system') setThemePrefState(theme);
       setReady(true);
-      // Kill + reopen: reminders are re-planned from the database every launch.
-      planReminders(db, t);
+      // Kill + reopen: reminders and widgets are rebuilt from the database every launch.
+      syncOutside(db, t);
     })();
     return () => {
       alive = false;
@@ -79,12 +84,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (now === today) return;
       setToday(now);
       setVersion((v) => v + 1);
-      planReminders(db, t);
+      syncOutside(db, t);
     };
     const midnight = fromKey(addDays(today, 1));
     midnight.setHours(0, 0, 1, 0);
     const timer = setTimeout(refresh, Math.max(1000, midnight.getTime() - Date.now()));
-    const sub = AppState.addEventListener('change', (s) => s === 'active' && refresh());
+    const sub = AppState.addEventListener('change', (s) => {
+      if (s !== 'active') return;
+      // A widget may have checked something off while the app was in the background.
+      setVersion((v) => v + 1);
+      refresh();
+    });
     return () => {
       clearTimeout(timer);
       sub.remove();
@@ -107,11 +117,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [db],
   );
 
-
   const changed = useCallback(() => {
     setVersion((v) => v + 1);
-    planReminders(db, t);
-  }, [db, t]);
+    syncOutside(db, t);
+  }, [db]);
 
   const commit = useCallback(
     async (write: () => Promise<unknown>) => {

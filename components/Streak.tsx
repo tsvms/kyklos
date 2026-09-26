@@ -2,10 +2,11 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { Animated, Easing, View, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Path, RadialGradient, Stop } from 'react-native-svg';
 import { useApp } from '@/lib/app-state';
+import { FLAME_PATH } from '@/lib/flame';
 import { rankIndex, rankProgress, type Rank } from '@/lib/ranks';
 import type { FlameState } from '@/lib/stats';
 import { FLAME, radius, withAlpha } from '@/lib/theme';
-import { Flame, FLAME_PATH } from './Flame';
+import { Flame } from './Flame';
 import { Text } from './ui';
 
 /** Small flame + number, used in habit rows. Grey when the streak is out. */

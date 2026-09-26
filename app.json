@@ -2,7 +2,7 @@
   "expo": {
     "name": "Kyklos",
     "slug": "kyklos",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "scheme": "kyklos",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -76,7 +76,8 @@
         "android.permission.CAMERA",
         "android.permission.USE_EXACT_ALARM"
       ],
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "versionCode": 2
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -114,7 +115,54 @@
           "enableBackgroundRemoteNotifications": true
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "react-native-android-widget",
+        {
+          "widgets": [
+            {
+              "name": "Streak",
+              "label": "Kyklos streak",
+              "description": "Your fire, your rank and today's progress.",
+              "minWidth": "110dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 2,
+              "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 1800000,
+              "previewImage": "./assets/widget-preview-streak.png"
+            },
+            {
+              "name": "Today",
+              "label": "Kyklos today",
+              "description": "Check off today's habits from the home screen.",
+              "minWidth": "250dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 4,
+              "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 1800000,
+              "previewImage": "./assets/widget-preview-today.png"
+            }
+          ]
+        }
+      ],
+      [
+        "expo-widgets",
+        {
+          "widgets": [
+            {
+              "name": "KyklosWidget",
+              "displayName": "Kyklos",
+              "description": "Your fire, your rank and today's habits.",
+              "supportedFamilies": [
+                "systemSmall",
+                "systemMedium"
+              ]
+            }
+          ]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

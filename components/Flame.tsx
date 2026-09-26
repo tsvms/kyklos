@@ -3,13 +3,9 @@ import { Animated, Easing, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Path, RadialGradient, Stop, Circle } from 'react-native-svg';
 import { useApp } from '@/lib/app-state';
 import type { FlameState } from '@/lib/stats';
+import { FLAME_CORE, FLAME_PATH } from '@/lib/flame';
 import { FLAME } from '@/lib/theme';
 
-// One flame drawn in a 100 × 128 box: an outer tongue and a pale core.
-export const FLAME_PATH =
-  'M50 4 C60 28 82 40 85 68 C88 98 70 124 50 124 C29 124 12 106 14 80 C15 63 24 53 31 45 C32 58 37 66 43 68 C38 46 42 22 50 4 Z';
-const CORE =
-  'M50 60 C57 73 69 82 69 99 C69 113 60 121 50 121 C40 121 31 113 31 101 C31 90 37 84 42 78 C44 86 47 89 51 89 C47 80 46 70 50 60 Z';
 
 /**
  * The streak fire. Lit: full colour, a soft glow and a slow flicker.
@@ -99,7 +95,7 @@ export function Flame({ state, size = 48, glow = true }: { state: FlameState; si
             </LinearGradient>
           </Defs>
           <Path d={FLAME_PATH} fill={`url(#o${id})`} />
-          <Path d={CORE} fill={`url(#c${id})`} />
+          <Path d={FLAME_CORE} fill={`url(#c${id})`} />
         </Svg>
       </Animated.View>
     </View>
