@@ -2,18 +2,18 @@ import Feather from '@expo/vector-icons/Feather';
 import * as Haptics from 'expo-haptics';
 import { router, useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
-import { useCallback, useState } from 'react';
-import { Linking, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { Animated, Easing, Linking, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { CheckCircle } from '@/components/CheckCircle';
 import { HabitIcon } from '@/components/HabitIcon';
 import { FlameCount, StreakHero } from '@/components/Streak';
 import { WeekStrip } from '@/components/WeekStrip';
-import { Button, Card, EmptyState, Screen, SectionLabel, Text } from '@/components/ui';
+import { Appear, Button, Card, EmptyState, Screen, SectionLabel, Text } from '@/components/ui';
 import { useApp, useData } from '@/lib/app-state';
 import { alert } from '@/lib/alert';
 import { fromKey, type DateKey } from '@/lib/date';
-import { deleteHabit, groupCheckins, listCheckins, listHabits, setArchived, setCheckin, type Habit } from '@/lib/db';
-import { greeting, longDate, scheduleSummary } from '@/lib/format';
+import { deleteHabit, groupCheckins, listCheckins, listHabits, setArchived, setCount, type Habit } from '@/lib/db';
+import { greeting, longDate, scheduleSummary, weekdayName } from '@/lib/format';
 import type { StringKey } from '@/lib/i18n';
 import { getPermission, requestPermission, type PermissionState } from '@/lib/notifications';
 import { rankFor, rankedUp } from '@/lib/ranks';
@@ -36,7 +36,7 @@ const editHabit = (id: number) => router.push({ pathname: '/habit/[id]/edit', pa
 
 export default function Today() {
   const db = useSQLiteContext();
-  const { colors, t, changed, today, notify } = useApp();
+  const { colors, t, changed, commit, today, notify } = useApp();
   const [selected, setSelected] = useState<DateKey>(today);
   const [editing, setEditing] = useState(false);
   // Snap back to today when the date rolls over.
@@ -50,11 +50,12 @@ export default function Today() {
 
   const data = useData(async (db) => {
     const [habits, checkins] = await Promise.all([listHabits(db), listCheckins(db)]);
-    return { habits, done: groupCheckins(checkins) };
+    const counts = new Map(checkins.map((c) => [`${c.habit_id}|${c.date}`, c.count]));
+    return { habits, counts, done: groupCheckins(checkins, habits) };
   });
 
-  // Optimistic overlay (habit id + date → done) so the circle responds instantly.
-  const [overrides, setOverrides] = useState<Record<string, boolean>>({});
+  // Optimistic overlay (habit id + date → times done) so the circle responds instantly.
+  const [overrides, setOverrides] = useState<Record<string, number>>({});
   const [permission, setPermission] = useState<PermissionState>('unavailable');
 
   useFocusEffect(
@@ -69,14 +70,16 @@ export default function Today() {
 
   const doneMap = new Map<number, Set<DateKey>>();
   for (const h of data.habits) doneMap.set(h.id, new Set(data.done.get(h.id) ?? []));
-  for (const [key, value] of Object.entries(overrides)) {
+  const perDay = new Map(data.habits.map((h) => [h.id, h.per_day]));
+  for (const [key, count] of Object.entries(overrides)) {
     const [id, date] = key.split('|');
     const set = doneMap.get(Number(id));
     if (!set) continue;
-    if (value) set.add(date);
+    if (count >= (perDay.get(Number(id)) ?? 1)) set.add(date);
     else set.delete(date);
   }
   const doneOf = (h: Habit) => doneMap.get(h.id)!;
+  const countOf = (h: Habit) => overrides[`${h.id}|${day}`] ?? data.counts.get(`${h.id}|${day}`) ?? 0;
 
   const due = data.habits.filter((h) => isDue(h, day, doneOf(h)));
   const completed = due.filter((h) => doneOf(h).has(day)).length;
@@ -86,24 +89,27 @@ export default function Today() {
   const wantsReminders = data.habits.some((h) => h.reminder_time);
   const showReminderNudge = isToday && wantsReminders && (permission === 'undetermined' || permission === 'denied');
 
-  const toggle = async (h: Habit, next: boolean) => {
+  const setTimes = async (h: Habit, next: number) => {
     const key = `${h.id}|${day}`;
+    const before = countOf(h);
     setOverrides((o) => ({ ...o, [key]: next }));
-    if (next && isToday) {
-      // Celebrate a new rank first; otherwise a habit milestone.
+    if (isToday && before < h.per_day && next >= h.per_day) {
+      // Celebrate a new rank first, then a habit milestone, then a finished day.
       const after = new Map(doneMap);
       after.set(h.id, new Set(doneOf(h)).add(day));
       const fireAfter = dailyStreak(data.habits, after, today).count;
       const streak = currentStreak(h, after.get(h.id)!, today);
+      const dayDone = completed + 1 === due.length && due.includes(h);
       if (rankedUp(fire.count, fireAfter)) notify(t('rank.up', { rank: rankFor(fireAfter).name[t.lang] }));
       else if (isMilestone(streak)) notify(t(MILESTONE_KEYS[streak] ?? 'milestone.generic', { n: streak }));
+      else if (dayDone) notify(t('today.allDone'));
     }
     try {
-      await setCheckin(db, h.id, day, next);
+      await setCount(db, h.id, day, next);
       changed();
     } catch (e) {
       console.warn('[kyklos] check-in failed', e);
-      setOverrides((o) => ({ ...o, [key]: !next }));
+      setOverrides((o) => ({ ...o, [key]: before }));
       notify(t('today.saveFailed'));
     }
   };
@@ -111,21 +117,8 @@ export default function Today() {
   const confirmDelete = (h: Habit) => {
     alert(t('detail.deleteTitle'), `${h.name}\n\n${t('detail.deleteBody')}`, [
       { text: t('common.cancel'), style: 'cancel' },
-      {
-        text: t('common.archive'),
-        onPress: async () => {
-          await setArchived(db, h.id, true);
-          changed();
-        },
-      },
-      {
-        text: t('common.delete'),
-        style: 'destructive',
-        onPress: async () => {
-          await deleteHabit(db, h.id);
-          changed();
-        },
-      },
+      { text: t('common.archive'), onPress: () => commit(() => setArchived(db, h.id, true)) },
+      { text: t('common.delete'), style: 'destructive', onPress: () => commit(() => deleteHabit(db, h.id)) },
     ]);
   };
 
@@ -154,7 +147,7 @@ export default function Today() {
       <View style={styles.header}>
         <View style={{ flex: 1 }}>
           <Text variant="display" numberOfLines={1} adjustsFontSizeToFit>
-            {isToday ? greeting(now, t) : longDate(fromKey(day), t).split(' ')[0]}
+            {isToday ? greeting(now, t) : weekdayName(fromKey(day), t)}
           </Text>
           <Text muted style={{ marginTop: 2 }}>
             {longDate(isToday ? now : fromKey(day), t)}
@@ -262,70 +255,78 @@ export default function Today() {
               </View>
               {!editing && <DayBar done={completed} total={due.length} />}
 
-              {(editing ? data.habits : due).map((h) => {
+              {(editing ? data.habits : due).map((h, i) => {
                 const done = doneOf(h);
                 const checked = done.has(day);
                 const color = habitColor(h.color);
                 const streak = currentStreak(h, done, day);
                 const doneToday = done.has(day) || !isDue(h, day, done);
                 let subtitle = scheduleSummary(h, t);
-                if (h.schedule_type === 'weekly') subtitle = t('today.weekProgress', weekProgress(h, done, day));
+                const times = countOf(h);
+                if (h.per_day > 1 && !checked) subtitle = t('today.perDayProgress', { done: times, total: h.per_day });
+                else if (h.schedule_type === 'weekly') subtitle = t('today.weekProgress', weekProgress(h, done, day));
                 else if (isToday && !checked && streak >= 2) subtitle = t('today.streakKeep', { n: streak });
                 return (
-                  <Pressable
-                    key={h.id}
-                    onPress={() => (editing ? editHabit(h.id) : openHabit(h.id))}
-                    onLongPress={editing ? undefined : () => showActions(h)}
-                    delayLongPress={350}
-                    accessibilityRole="button"
-                    accessibilityLabel={h.name}
-                    accessibilityHint={editing ? t('detail.editA11y') : `${subtitle}. ${t('today.actionsHint')}`}
-                    style={({ pressed }) => [
-                      styles.habit,
-                      {
-                        backgroundColor: checked && !editing ? withAlpha(color, 0.12) : colors.card,
-                        borderColor: checked && !editing ? withAlpha(color, 0.35) : colors.border,
-                        transform: [{ scale: pressed ? 0.985 : 1 }],
-                      },
-                    ]}
-                  >
-                    <HabitIcon name={h.icon} color={color} size={46} />
-                    <View style={{ flex: 1, gap: 3 }}>
-                      <Text variant="label" numberOfLines={1} style={{ fontSize: 16, fontWeight: '600' }}>
-                        {h.name}
-                      </Text>
-                      <Text variant="caption" muted numberOfLines={1} style={{ fontVariant: ['tabular-nums'] }}>
-                        {editing ? scheduleSummary(h, t) : subtitle}
-                      </Text>
-                    </View>
-                    {editing ? (
-                      <>
-                        <Feather name="edit-2" size={18} color={colors.muted} style={{ marginHorizontal: 6 }} />
-                        <Pressable
-                          onPress={() => confirmDelete(h)}
-                          accessibilityRole="button"
-                          accessibilityLabel={t('today.deleteA11y', { name: h.name })}
-                          hitSlop={8}
-                          style={({ pressed }) => [
-                            styles.trash,
-                            { backgroundColor: withAlpha(colors.danger, 0.12), opacity: pressed ? 0.6 : 1 },
-                          ]}
-                        >
-                          <Feather name="trash-2" size={18} color={colors.danger} />
-                        </Pressable>
-                      </>
-                    ) : (
-                      <>
-                        <FlameCount n={streak} state={flameState(streak, doneToday)} />
-                        <CheckCircle
-                          checked={checked}
-                          color={color}
-                          onToggle={(next) => toggle(h, next)}
-                          label={t(checked ? 'today.markUndone' : 'today.markDone', { name: h.name })}
-                        />
-                      </>
-                    )}
-                  </Pressable>
+                  <Appear key={h.id} index={i}>
+                    <Pressable
+                      onPress={() => (editing ? editHabit(h.id) : openHabit(h.id))}
+                      onLongPress={editing ? undefined : () => showActions(h)}
+                      delayLongPress={350}
+                      accessibilityRole="button"
+                      accessibilityLabel={h.name}
+                      accessibilityHint={editing ? t('detail.editA11y') : `${subtitle}. ${t('today.actionsHint')}`}
+                      style={({ pressed }) => [
+                        styles.habit,
+                        {
+                          backgroundColor: checked && !editing ? withAlpha(color, 0.12) : colors.card,
+                          borderColor: checked && !editing ? withAlpha(color, 0.35) : colors.border,
+                          transform: [{ scale: pressed ? 0.985 : 1 }],
+                        },
+                      ]}
+                    >
+                      <HabitIcon name={h.icon} color={color} size={46} />
+                      <View style={{ flex: 1, gap: 3 }}>
+                        <Text variant="label" numberOfLines={1} style={{ fontSize: 16, fontWeight: '600' }}>
+                          {h.name}
+                        </Text>
+                        <Text variant="caption" muted numberOfLines={1} style={{ fontVariant: ['tabular-nums'] }}>
+                          {editing ? scheduleSummary(h, t) : subtitle}
+                        </Text>
+                      </View>
+                      {editing ? (
+                        <>
+                          <Feather name="edit-2" size={18} color={colors.muted} style={{ marginHorizontal: 6 }} />
+                          <Pressable
+                            onPress={() => confirmDelete(h)}
+                            accessibilityRole="button"
+                            accessibilityLabel={t('today.deleteA11y', { name: h.name })}
+                            hitSlop={8}
+                            style={({ pressed }) => [
+                              styles.trash,
+                              { backgroundColor: withAlpha(colors.danger, 0.12), opacity: pressed ? 0.6 : 1 },
+                            ]}
+                          >
+                            <Feather name="trash-2" size={18} color={colors.danger} />
+                          </Pressable>
+                        </>
+                      ) : (
+                        <>
+                          <FlameCount n={streak} state={flameState(streak, doneToday)} />
+                          <CheckCircle
+                            count={times}
+                            target={h.per_day}
+                            color={color}
+                            onChange={(next) => setTimes(h, next)}
+                            label={
+                              h.per_day > 1
+                                ? t('today.countA11y', { name: h.name, done: times, total: h.per_day })
+                                : t(checked ? 'today.markUndone' : 'today.markDone', { name: h.name })
+                            }
+                          />
+                        </>
+                      )}
+                    </Pressable>
+                  </Appear>
                 );
               })}
 
@@ -349,13 +350,24 @@ export default function Today() {
   );
 }
 
-/** Slim progress for the day's list. */
+/** Slim progress for the day's list; it glides to each new value. */
 function DayBar({ done, total }: { done: number; total: number }) {
   const { colors } = useApp();
   const ratio = total === 0 ? 0 : done / total;
+  const [anim] = useState(() => new Animated.Value(ratio));
+  useEffect(() => {
+    Animated.timing(anim, { toValue: ratio, duration: 450, easing: Easing.out(Easing.cubic), useNativeDriver: false }).start();
+  }, [ratio, anim]);
   return (
     <View style={{ height: 6, borderRadius: 3, backgroundColor: colors.faint, overflow: 'hidden', marginBottom: 4 }}>
-      <View style={{ width: `${ratio * 100}%`, height: 6, borderRadius: 3, backgroundColor: colors.accent }} />
+      <Animated.View
+        style={{
+          width: anim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
+          height: 6,
+          borderRadius: 3,
+          backgroundColor: colors.accent,
+        }}
+      />
     </View>
   );
 }

@@ -24,7 +24,8 @@ describe('parseBackup', () => {
   it('accepts a real export (round-trip shape)', () => {
     const b = parseBackup(JSON.stringify(valid));
     expect(b?.habits).toHaveLength(1);
-    expect(b?.checkins).toEqual([{ habit_id: 1, date: '2026-09-21' }]);
+    expect(b?.checkins).toEqual([{ habit_id: 1, date: '2026-09-21', count: 1 }]);
+    expect(b?.habits[0].per_day).toBe(1); // older backups: a simple check
     expect(b?.exportedOn).toBe('2026-09-24');
   });
 
@@ -39,6 +40,15 @@ describe('parseBackup', () => {
     expect(parseBackup(JSON.stringify({ ...valid, habits: [{ ...habit, reminder_time: '25:00' }] }))).toBeNull();
     expect(parseBackup(JSON.stringify({ ...valid, checkins: [{ habit_id: 2, date: '2026-09-21' }] }))).toBeNull();
     expect(parseBackup(JSON.stringify({ ...valid, checkins: [{ habit_id: 1, date: '21/09/2026' }] }))).toBeNull();
+  });
+
+  it('keeps "N times a day" habits and their counts', () => {
+    const b = parseBackup(
+      JSON.stringify({ ...valid, habits: [{ ...habit, per_day: 8 }], checkins: [{ habit_id: 1, date: '2026-09-21', count: 5 }] }),
+    );
+    expect(b?.habits[0].per_day).toBe(8);
+    expect(b?.checkins[0].count).toBe(5);
+    expect(parseBackup(JSON.stringify({ ...valid, habits: [{ ...habit, per_day: 0 }] }))).toBeNull();
   });
 
   it('softens what is safe to soften', () => {

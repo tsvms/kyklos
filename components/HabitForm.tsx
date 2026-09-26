@@ -3,7 +3,7 @@ import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
 import { Linking, Platform, Pressable, StyleSheet, Switch, TextInput, View } from 'react-native';
 import { useApp } from '@/lib/app-state';
-import type { HabitInput } from '@/lib/db';
+import { MAX_PER_DAY, type HabitInput } from '@/lib/db';
 import { WEEK_ORDER } from '@/lib/format';
 import { requestPermission, type PermissionState } from '@/lib/notifications';
 import { ALL_DAYS_MASK, type ScheduleType } from '@/lib/schedule';
@@ -19,6 +19,7 @@ export const EMPTY_HABIT: HabitInput = {
   days_mask: ALL_DAYS_MASK,
   times_per_week: 3,
   interval_days: 2,
+  per_day: 1,
   reminder_time: null,
 };
 
@@ -33,12 +34,13 @@ export function HabitForm({
 }: {
   initial: HabitInput;
   submitLabel: string;
-  onSubmit: (h: HabitInput) => void;
+  onSubmit: (h: HabitInput) => Promise<void>;
 }) {
   const { colors, t } = useApp();
   const [h, setH] = useState<HabitInput>(initial);
   const [error, setError] = useState<string | null>(null);
   const [permission, setPermission] = useState<PermissionState | null>(null);
+  const [saving, setSaving] = useState(false);
   // Square cells, five per row, sized from the real width so the selection is centred.
   const [gridWidth, setGridWidth] = useState(0);
   const cell = gridWidth > 0 ? Math.floor((gridWidth - ICON_GAP * (ICON_COLS - 1)) / ICON_COLS) : 0;
@@ -57,15 +59,24 @@ export function HabitForm({
   };
 
   const toggleDay = (d: number) => {
-    Haptics.selectionAsync().catch(() => {});
+    if (Platform.OS !== 'web') Haptics.selectionAsync().catch(() => {});
     set({ days_mask: h.days_mask ^ (1 << d) });
   };
 
-  const submit = () => {
+  // One save at a time: a quick double tap must not create the habit twice.
+  const submit = async () => {
+    if (saving) return;
     const name = h.name.trim();
     if (!name) return setError(t('form.nameRequired'));
     if (h.schedule_type === 'weekdays' && h.days_mask === 0) return setError(t('form.dayRequired'));
-    onSubmit({ ...h, name });
+    setSaving(true);
+    try {
+      await onSubmit({ ...h, name });
+    } catch (e) {
+      console.warn('[kyklos] save failed', e);
+      setError(t('today.saveFailed'));
+      setSaving(false);
+    }
   };
 
   const scheduleOptions: { value: ScheduleType; label: string; hint: string; icon: IconName }[] = [
@@ -202,6 +213,18 @@ export function HabitForm({
             <Stepper label={t('form.everyNDays')} value={h.interval_days} min={2} max={30} onChange={(n) => set({ interval_days: n })} />
           </View>
         )}
+
+        <View style={{ gap: space.xs }}>
+          <View style={styles.inline}>
+            <Text muted>{t('form.perDay')}</Text>
+            <Stepper label={t('form.perDay')} value={h.per_day} min={1} max={MAX_PER_DAY} onChange={(n) => set({ per_day: n })} />
+          </View>
+          {h.per_day > 1 && (
+            <Text variant="caption" muted>
+              {t('form.perDayHint')}
+            </Text>
+          )}
+        </View>
       </Card>
 
       <SectionLabel>{t('form.reminder')}</SectionLabel>
@@ -244,7 +267,7 @@ export function HabitForm({
           {error}
         </Text>
       )}
-      <Button label={submitLabel} onPress={submit} style={{ marginTop: space.sm }} />
+      <Button label={submitLabel} onPress={submit} disabled={saving} style={{ marginTop: space.sm }} />
     </View>
   );
 }

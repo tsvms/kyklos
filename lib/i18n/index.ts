@@ -17,15 +17,14 @@ const en = {
   'today.morning': 'Good morning',
   'today.afternoon': 'Good afternoon',
   'today.evening': 'Good evening',
-  'today.progress': '{done} of {total}',
   'today.allDone': 'All done for today. Rest well.',
-  'today.keepGoing': 'One small step at a time.',
   'today.emptyTitle': 'Start with something small',
   'today.emptyBody': 'One habit is enough. Small steps make full circles.',
   'today.freeTitle': 'A free day',
   'today.freeBody': 'Nothing scheduled for today. Enjoy it.',
   'today.weekProgress': '{done}/{target} this week',
-  'today.streak': '{n} in a row',
+  'today.perDayProgress': '{done} of {total} today',
+  'today.countA11y': '{name}: {done} of {total}. Tap to add one, hold to take one back.',
   'today.markDone': 'Mark {name} as done',
   'today.markUndone': 'Mark {name} as not done',
 
@@ -53,6 +52,8 @@ const en = {
   'form.nameRequired': 'Give it a name',
   'form.dayRequired': 'Pick at least one day',
   'form.timesPerWeek': 'Times per week',
+  'form.perDay': 'Times a day',
+  'form.perDayHint': 'For things like glasses of water. Each tap on the circle counts one; hold it to take one back.',
   'form.everyNDays': 'Every how many days',
 
   'schedule.daily': 'Every day',
@@ -60,10 +61,9 @@ const en = {
   'schedule.weekdays': 'Specific days',
   'schedule.interval': 'Every N days',
   'schedule.weeklySummary': '{n}× a week',
+  'schedule.perDay': '{n}× a day',
   'schedule.intervalSummary': 'Every {n} days',
 
-  'detail.current': 'Current streak',
-  'detail.best': 'Best streak',
   'detail.rate': '30-day rate',
   'detail.history': 'Last 17 weeks',
   'detail.archived': 'Archived — history kept, no reminders.',
@@ -74,13 +74,11 @@ const en = {
   'detail.legendMissed': 'Open',
   'detail.checkins': '{n} check-ins',
 
-  'stats.total': 'Total check-ins',
   'stats.thisWeek': 'This week',
   'stats.weeks': 'Last 8 weeks',
   'stats.habits': 'Your habits',
   'stats.emptyTitle': 'Your stats will grow with you',
   'stats.emptyBody': 'Check off a habit today and the first bar appears here.',
-  'stats.streakShort': '{n} streak',
 
   'settings.appearance': 'Appearance',
   'settings.system': 'System',
@@ -104,7 +102,6 @@ const en = {
   'today.backToToday': 'Back to today',
   'today.pastHint': 'Forgot to check in? You can fill in any of the last 7 days.',
   'today.streakKeep': '{n} in a row · keep it going today',
-  'today.perfectDays': 'days in a row with everything done',
   'today.dayA11y': '{date}: {done} of {total}',
   'today.restDay': 'Nothing was planned for this day.',
 
@@ -117,8 +114,6 @@ const en = {
   'milestone.365': 'A full year. Thank you for showing up.',
   'milestone.generic': '{n} in a row. Well done.',
 
-  'streak.inARow': 'in a row',
-  'streak.next': 'Next milestone: {n}',
   'streak.best': 'Best: {n}',
 
   'detail.total': 'Check-ins',
@@ -129,7 +124,6 @@ const en = {
   'schedule.weeklyHint': 'Any days, X times',
   'schedule.intervalHint': 'Every 2, 3… days',
 
-  'stats.perfect': 'Complete days in a row',
   'stats.rate30': '30-day rate',
 
   'settings.privacyShort': 'No accounts. No tracking. Your data stays on this phone.',
@@ -161,7 +155,7 @@ const en = {
   'error.retry': 'Try again',
 
   'seed.read': 'Read',
-  'seed.water': 'Glass of water',
+  'seed.water': 'Drink water',
   'seed.walk': 'Walk',
 
   'streak.unit': 'day streak',
@@ -217,15 +211,14 @@ const el: Partial<Record<StringKey, string>> = {
   'today.morning': 'Καλημέρα',
   'today.afternoon': 'Καλό απόγευμα',
   'today.evening': 'Καλησπέρα',
-  'today.progress': '{done} από {total}',
   'today.allDone': 'Όλα έγιναν για σήμερα. Ξεκουράσου.',
-  'today.keepGoing': 'Ένα μικρό βήμα τη φορά.',
   'today.emptyTitle': 'Ξεκίνα με κάτι μικρό',
   'today.emptyBody': 'Μία συνήθεια αρκεί. Τα μικρά βήματα κλείνουν κύκλους.',
   'today.freeTitle': 'Ελεύθερη μέρα',
   'today.freeBody': 'Τίποτα προγραμματισμένο για σήμερα. Απόλαυσέ το.',
   'today.weekProgress': '{done}/{target} αυτή την εβδομάδα',
-  'today.streak': '{n} στη σειρά',
+  'today.perDayProgress': '{done} από {total} σήμερα',
+  'today.countA11y': '{name}: {done} από {total}. Πάτα για να προσθέσεις ένα, κράτα για να αφαιρέσεις.',
   'today.markDone': 'Ολοκλήρωση: {name}',
   'today.markUndone': 'Αναίρεση: {name}',
 
@@ -253,6 +246,8 @@ const el: Partial<Record<StringKey, string>> = {
   'form.nameRequired': 'Δώσε ένα όνομα',
   'form.dayRequired': 'Διάλεξε τουλάχιστον μία μέρα',
   'form.timesPerWeek': 'Φορές την εβδομάδα',
+  'form.perDay': 'Φορές την ημέρα',
+  'form.perDayHint': 'Για πράγματα όπως ποτήρια νερό. Κάθε πάτημα στον κύκλο μετράει ένα· κράτα τον πατημένο για να αφαιρέσεις.',
   'form.everyNDays': 'Κάθε πόσες μέρες',
 
   'schedule.daily': 'Κάθε μέρα',
@@ -260,10 +255,9 @@ const el: Partial<Record<StringKey, string>> = {
   'schedule.weekdays': 'Συγκεκριμένες μέρες',
   'schedule.interval': 'Κάθε Ν μέρες',
   'schedule.weeklySummary': '{n}× την εβδομάδα',
+  'schedule.perDay': '{n}× την ημέρα',
   'schedule.intervalSummary': 'Κάθε {n} μέρες',
 
-  'detail.current': 'Τρέχον σερί',
-  'detail.best': 'Καλύτερο σερί',
   'detail.rate': 'Ποσοστό 30 ημ.',
   'detail.history': 'Τελευταίες 17 εβδομάδες',
   'detail.archived': 'Σε αρχείο — το ιστορικό μένει, χωρίς υπενθυμίσεις.',
@@ -274,13 +268,11 @@ const el: Partial<Record<StringKey, string>> = {
   'detail.legendMissed': 'Ανοιχτό',
   'detail.checkins': '{n} ολοκληρώσεις',
 
-  'stats.total': 'Σύνολο ολοκληρώσεων',
   'stats.thisWeek': 'Αυτή την εβδομάδα',
   'stats.weeks': 'Τελευταίες 8 εβδομάδες',
   'stats.habits': 'Οι συνήθειές σου',
   'stats.emptyTitle': 'Τα στατιστικά μεγαλώνουν μαζί σου',
   'stats.emptyBody': 'Ολοκλήρωσε μία συνήθεια σήμερα και η πρώτη μπάρα θα εμφανιστεί εδώ.',
-  'stats.streakShort': 'σερί {n}',
 
   'settings.appearance': 'Εμφάνιση',
   'settings.system': 'Σύστημα',
@@ -304,7 +296,6 @@ const el: Partial<Record<StringKey, string>> = {
   'today.backToToday': 'Πίσω στο σήμερα',
   'today.pastHint': 'Ξέχασες να το σημειώσεις; Μπορείς να συμπληρώσεις οποιαδήποτε από τις τελευταίες 7 μέρες.',
   'today.streakKeep': '{n} στη σειρά · συνέχισέ το σήμερα',
-  'today.perfectDays': 'μέρες στη σειρά με όλα ολοκληρωμένα',
   'today.dayA11y': '{date}: {done} από {total}',
   'today.restDay': 'Τίποτα δεν ήταν προγραμματισμένο αυτή τη μέρα.',
 
@@ -317,8 +308,6 @@ const el: Partial<Record<StringKey, string>> = {
   'milestone.365': 'Ένας ολόκληρος χρόνος. Ευχαριστούμε που είσαι εδώ.',
   'milestone.generic': '{n} στη σειρά. Μπράβο σου.',
 
-  'streak.inARow': 'στη σειρά',
-  'streak.next': 'Επόμενος στόχος: {n}',
   'streak.best': 'Καλύτερο: {n}',
 
   'detail.total': 'Ολοκληρώσεις',
@@ -329,7 +318,6 @@ const el: Partial<Record<StringKey, string>> = {
   'schedule.weeklyHint': 'Όποιες μέρες, Χ φορές',
   'schedule.intervalHint': 'Κάθε 2, 3… μέρες',
 
-  'stats.perfect': 'Ολοκληρωμένες μέρες στη σειρά',
   'stats.rate30': 'Ποσοστό 30 ημερών',
 
   'settings.privacyShort': 'Χωρίς λογαριασμούς. Χωρίς παρακολούθηση. Τα δεδομένα σου μένουν στο κινητό.',
@@ -361,7 +349,7 @@ const el: Partial<Record<StringKey, string>> = {
   'error.retry': 'Δοκίμασε ξανά',
 
   'seed.read': 'Διάβασμα',
-  'seed.water': 'Ένα ποτήρι νερό',
+  'seed.water': 'Πιες νερό',
   'seed.walk': 'Περπάτημα',
 
   'streak.unit': 'μέρες σερί',

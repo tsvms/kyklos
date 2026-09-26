@@ -134,23 +134,6 @@ export function dayCompletion(habits: Tracked[], done: ReadonlyMap<number, Reado
 }
 
 /**
- * Consecutive days on which *everything* due was done. Days with nothing
- * due are skipped (a rest day never breaks it) and an open today is forgiven.
- */
-export function perfectDayStreak(habits: Tracked[], done: ReadonlyMap<number, ReadonlySet<DateKey>>, today: DateKey) {
-  if (habits.length === 0) return 0;
-  const earliest = habits.reduce((m, h) => (h.created_at < m ? h.created_at : m), today);
-  let streak = 0;
-  for (let d = today; d >= earliest; d = addDays(d, -1)) {
-    const { done: c, total } = dayCompletion(habits, done, d);
-    if (total === 0) continue;
-    if (c === total) streak++;
-    else if (d !== today) break;
-  }
-  return streak;
-}
-
-/**
  * The app-wide fire: consecutive days on which at least one due habit was
  * done. Days with nothing due are skipped (they never break it) and an open
  * today is forgiven until midnight.
@@ -197,20 +180,9 @@ export function flameState(streak: number, doneToday: boolean): FlameState {
 
 // ——— milestones (streak psychology only: no points, no badges) ———
 
-export const MILESTONES = [3, 7, 14, 21, 30, 50, 75, 100, 150, 200, 250, 365, 500, 730, 1000] as const;
+const MILESTONES = [3, 7, 14, 21, 30, 50, 75, 100, 150, 200, 250, 365, 500, 730, 1000] as const;
 
 export function isMilestone(n: number): boolean {
   return (MILESTONES as readonly number[]).includes(n) || (n > 1000 && n % 365 === 0);
 }
 
-/** The next gentle target above `n`. */
-export function nextMilestone(n: number): number {
-  return MILESTONES.find((m) => m > n) ?? Math.ceil((n + 1) / 365) * 365;
-}
-
-/** The milestone just reached or passed (0 when none yet). */
-export function previousMilestone(n: number): number {
-  let prev = 0;
-  for (const m of MILESTONES) if (m <= n) prev = m;
-  return prev;
-}

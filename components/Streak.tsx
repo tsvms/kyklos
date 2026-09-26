@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Animated, Easing, View, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Path, RadialGradient, Stop } from 'react-native-svg';
 import { useApp } from '@/lib/app-state';
@@ -141,6 +141,18 @@ export function StreakHero({
 }) {
   const { colors, t, scheme } = useApp();
   const { rank } = rankProgress(count);
+  const [bump] = useState(() => new Animated.Value(1));
+  const prev = useRef(count);
+
+  // The number pops when the streak grows.
+  useEffect(() => {
+    if (count > prev.current) {
+      bump.setValue(1.22);
+      Animated.spring(bump, { toValue: 1, friction: 4, tension: 120, useNativeDriver: true }).start();
+    }
+    prev.current = count;
+  }, [count, bump]);
+
   return (
     <View
       style={{
@@ -162,14 +174,16 @@ export function StreakHero({
         </View>
         <View style={{ flex: 1, gap: 2 }}>
           <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8 }}>
-            <Text
-              variant="number"
-              color={state === 'out' ? colors.heroMuted : colors.heroText}
-              style={{ fontSize: 56, lineHeight: 62 }}
-              maxFontSizeMultiplier={1.2}
-            >
-              {count}
-            </Text>
+            <Animated.View style={{ transformOrigin: 'bottom left', transform: [{ scale: bump }] }}>
+              <Text
+                variant="number"
+                color={state === 'out' ? colors.heroMuted : colors.heroText}
+                style={{ fontSize: 56, lineHeight: 62 }}
+                maxFontSizeMultiplier={1.2}
+              >
+                {count}
+              </Text>
+            </Animated.View>
             <Text variant="label" color={colors.heroMuted} style={{ flexShrink: 1 }} numberOfLines={2}>
               {unit}
             </Text>

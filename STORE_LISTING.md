@@ -53,7 +53,7 @@ All data is local SQLite.
 **Ads.** No.
 
 **Permissions declarations.**
-- `SCHEDULE_EXACT_ALARM` / `USE_EXACT_ALARM`: Google may ask for justification. The honest one: *"User-scheduled habit reminders at a time the user picks."* `USE_EXACT_ALARM` is reserved for alarm and calendar apps. If Play rejects it, remove that single line from `android.permissions` in `app.json` and rebuild; reminders keep working through `SCHEDULE_EXACT_ALARM`, or arrive slightly inexact.
+- `SCHEDULE_EXACT_ALARM`: Google may ask for justification. The honest one: *"User-scheduled habit reminders at a time the user picks."* `USE_EXACT_ALARM` (alarm and calendar apps only) is blocked in `app.json`, so no declaration is needed for it.
 
 ---
 
@@ -72,6 +72,7 @@ All data is local SQLite.
 • Η φωτιά του σερί: ανάβει όσο συνεχίζεις, σβήνει γκρι όταν σταματάς
 • 10 βαθμίδες, από Σπίθα μέχρι Ολύμπια Φλόγα, ανάλογα με το σερί σου
 • Ευέλικτο πρόγραμμα: κάθε μέρα, Χ φορές την εβδομάδα, συγκεκριμένες μέρες ή κάθε Ν μέρες
+• Χ φορές την ημέρα: π.χ. 6 ποτήρια νερό, με μετρητή που γεμίζει
 • Ξέχασες χθες; Συμπλήρωσε οποιαδήποτε από τις τελευταίες 7 μέρες
 • Ιστορικό 17 εβδομάδων, εβδομαδιαία στατιστικά, ποσοστό 30 ημερών
 • Μία ήσυχη υπενθύμιση ανά συνήθεια
@@ -94,6 +95,7 @@ Kyklos helps you build small habits without pressure.
 • The streak fire: it burns while you keep going and turns to grey ash when you stop
 • 10 ranks, from Spark to Olympian, depending on your streak
 • Flexible schedules: every day, X times a week, specific weekdays or every N days
+• X times a day: e.g. 6 glasses of water, with a counter that fills up
 • Forgot yesterday? Fill in any of the last 7 days
 • 17-week history, weekly stats, 30-day completion rate
 • One quiet reminder per habit

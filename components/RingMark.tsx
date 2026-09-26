@@ -6,7 +6,7 @@ import { useApp } from '@/lib/app-state';
  * The Kyklos mark: one terracotta ring with a small opening near the top —
  * a cycle that is almost, but not yet, closed. Same geometry as the app icon.
  */
-export function RingMark({ size = 64, color }: { size?: number; color?: string }) {
+export function RingMark({ size = 64 }: { size?: number }) {
   const { colors } = useApp();
   const stroke = size * 0.14;
   const r = (size - stroke) / 2;
@@ -19,7 +19,7 @@ export function RingMark({ size = 64, color }: { size?: number; color?: string }
           cx={size / 2}
           cy={size / 2}
           r={r}
-          stroke={color ?? colors.accent}
+          stroke={colors.accent}
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={`${c - gap} ${gap}`}

@@ -1,7 +1,7 @@
 // Pure validation of a Kyklos JSON backup. Nothing here touches the database:
 // a file that fails any check is rejected as a whole, so a bad import can
 // never leave the phone half-restored.
-import type { Checkin, Habit } from './db';
+import { MAX_PER_DAY, type Checkin, type Habit } from './db';
 import type { ScheduleType } from './schedule';
 import { HABIT_COLOR_KEYS, type HabitColor } from './theme';
 
@@ -27,6 +27,8 @@ function habitFrom(raw: unknown): Habit | null {
   if (!int(h.days_mask, 0, 127) || !int(h.times_per_week, 1, 7) || !int(h.interval_days, 1, 365)) return null;
   if (h.reminder_time !== null && !(typeof h.reminder_time === 'string' && TIME.test(h.reminder_time))) return null;
   if (typeof h.created_at !== 'string' || !DATE.test(h.created_at)) return null;
+  // Older backups have no per_day: those habits were simple checks.
+  if (h.per_day !== undefined && !int(h.per_day, 1, MAX_PER_DAY)) return null;
   return {
     id: h.id as number,
     name: h.name.trim(),
@@ -36,6 +38,7 @@ function habitFrom(raw: unknown): Habit | null {
     days_mask: h.days_mask as number,
     times_per_week: h.times_per_week as number,
     interval_days: h.interval_days as number,
+    per_day: (h.per_day as number | undefined) ?? 1,
     reminder_time: (h.reminder_time as string | null) ?? null,
     archived: h.archived === 1 ? 1 : 0,
     created_at: h.created_at,
@@ -69,10 +72,11 @@ export function parseBackup(text: string): Backup | null {
     if (!r || typeof r !== 'object') return null;
     const c = r as Record<string, unknown>;
     if (!ids.has(c.habit_id as number) || typeof c.date !== 'string' || !DATE.test(c.date)) return null;
+    if (c.count !== undefined && !int(c.count, 1, 999)) return null;
     const key = `${c.habit_id}|${c.date}`;
     if (seen.has(key)) continue; // duplicates are harmless; keep one
     seen.add(key);
-    checkins.push({ habit_id: c.habit_id as number, date: c.date });
+    checkins.push({ habit_id: c.habit_id as number, date: c.date, count: (c.count as number | undefined) ?? 1 });
   }
 
   const exportedOn = typeof b.exportedOn === 'string' && DATE.test(b.exportedOn) ? b.exportedOn : '';

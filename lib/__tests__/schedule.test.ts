@@ -1,6 +1,6 @@
 import { addDays, daysBetween, startOfWeek, toKey, weekday } from '../date';
 import { dueDates, isDue, maskFromDays, type Schedule } from '../schedule';
-import { bestStreak, completionRate, currentStreak, dayCompletion, isMilestone, nextMilestone, perfectDayStreak, previousMilestone, weekProgress, weeklyTotals } from '../stats';
+import { bestStreak, completionRate, currentStreak, dayCompletion, isMilestone, weekProgress, weeklyTotals } from '../stats';
 import { upper } from '../text';
 
 // Fixture week: Monday 2026-09-21 … Sunday 2026-09-27.
@@ -182,32 +182,12 @@ describe('across habits', () => {
     expect(dayCompletion([read, water], done, TUE)).toEqual({ done: 0, total: 1 });
   });
 
-  it('perfect days: consecutive days with everything done, open today forgiven', () => {
-    const done = new Map([
-      [1, new Set([MON, WED])],
-      [2, new Set([MON, TUE, WED])],
-    ]);
-    expect(perfectDayStreak([read, water], done, WED)).toBe(3);
-    expect(perfectDayStreak([read, water], done, THU)).toBe(3);
-    expect(perfectDayStreak([read, water], done, FRI)).toBe(0);
-  });
-
-  it('rest days never break a perfect streak', () => {
-    const only = [read];
-    const done = new Map([[1, new Set([MON, WED])]]);
-    expect(perfectDayStreak(only, done, THU)).toBe(2);
-  });
 });
 
 describe('milestones', () => {
   it('knows the gentle targets', () => {
     expect(isMilestone(7)).toBe(true);
     expect(isMilestone(8)).toBe(false);
-    expect(nextMilestone(0)).toBe(3);
-    expect(nextMilestone(7)).toBe(14);
-    expect(nextMilestone(1000)).toBe(1095);
-    expect(previousMilestone(10)).toBe(7);
-    expect(previousMilestone(2)).toBe(0);
   });
 });
 

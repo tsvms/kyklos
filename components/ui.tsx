@@ -1,6 +1,8 @@
 import Feather from '@expo/vector-icons/Feather';
-import type { ComponentProps, ReactNode } from 'react';
+import { useEffect, useState, type ComponentProps, type ReactNode } from 'react';
 import {
+  Animated,
+  Easing,
   Platform,
   Pressable,
   ScrollView,
@@ -56,15 +58,11 @@ export function Text({
 
 export function Screen({
   children,
-  scroll = true,
   edgeTop = false,
-  contentStyle,
 }: {
   children: ReactNode;
-  scroll?: boolean;
   /** A tab screen: no header, so pad for the status bar and the floating tab bar. */
   edgeTop?: boolean;
-  contentStyle?: StyleProp<ViewStyle>;
 }) {
   const { colors } = useApp();
   const insets = useSafeAreaInsets();
@@ -75,9 +73,7 @@ export function Screen({
       // Tab screens (the only ones without a header) scroll under the floating bar.
       paddingBottom: edgeTop ? Math.max(insets.bottom, 8) + TAB_BAR_HEIGHT + TAB_BAR_GAP + space.lg : space.xxl,
     },
-    contentStyle,
   ];
-  if (!scroll) return <View style={[{ flex: 1, backgroundColor: colors.bg }, pad]}>{children}</View>;
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={pad} keyboardShouldPersistTaps="handled">
@@ -107,7 +103,7 @@ export function SectionLabel({ children, style }: { children: string; style?: St
   );
 }
 
-type ButtonKind = 'primary' | 'secondary' | 'danger' | 'ghost';
+type ButtonKind = 'primary' | 'secondary' | 'danger';
 
 export function Button({
   label,
@@ -248,6 +244,27 @@ export function EmptyState({
       )}
       {action && <Button label={action.label} onPress={action.onPress} icon="plus" style={{ marginTop: space.sm }} />}
     </View>
+  );
+}
+
+/** Fades and lifts its content in once, on mount; `index` staggers a list. */
+export function Appear({ index = 0, children }: { index?: number; children: ReactNode }) {
+  const [anim] = useState(() => new Animated.Value(0));
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 320,
+      delay: Math.min(index, 8) * 45,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [anim, index]);
+  return (
+    <Animated.View
+      style={{ opacity: anim, transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [10, 0] }) }] }}
+    >
+      {children}
+    </Animated.View>
   );
 }
 

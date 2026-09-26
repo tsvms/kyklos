@@ -19,17 +19,16 @@ export default function Stats() {
   const { t, today, colors } = useApp();
 
   const data = useData(async (db) => {
-    const [habits, checkins] = await Promise.all([listHabits(db), listCheckins(db)]);
-    return { habits, checkins, done: groupCheckins(checkins) };
+    const [habits, all] = await Promise.all([listHabits(db), listCheckins(db)]);
+    // Only completed days of active habits count; archived ones keep their history.
+    const done = groupCheckins(all, habits);
+    const days = [...done.values()].flatMap((s) => [...s]);
+    return { habits, days, done };
   });
 
   if (!data) return <Screen edgeTop>{null}</Screen>;
 
-  const weeks = weeklyTotals(
-    data.checkins.map((c) => c.date),
-    today,
-    8,
-  );
+  const weeks = weeklyTotals(data.days, today, 8);
   const thisWeek = weeks[weeks.length - 1].count;
   const fire = dailyStreak(data.habits, data.done, today);
   const best = bestDailyStreak(data.habits, data.done, today);
@@ -44,7 +43,7 @@ export default function Stats() {
     <Screen edgeTop>
       <Text variant="display">{t('tabs.stats')}</Text>
 
-      {data.checkins.length === 0 ? (
+      {data.days.length === 0 ? (
         <EmptyState title={t('stats.emptyTitle')} body={t('stats.emptyBody')} />
       ) : (
         <>

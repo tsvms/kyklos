@@ -18,11 +18,12 @@ export default function HabitDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const habitId = Number(id);
   const db = useSQLiteContext();
-  const { colors, t, changed, today } = useApp();
+  const { colors, t, commit, today } = useApp();
 
   const data = useData(async (db) => {
     const [habit, checkins] = await Promise.all([getHabit(db, habitId), listCheckins(db, habitId)]);
-    return { habit, done: new Set(checkins.map((c) => c.date)) };
+    const perDay = habit?.per_day ?? 1;
+    return { habit, done: new Set(checkins.filter((c) => c.count >= perDay).map((c) => c.date)) };
   }, habitId);
 
   if (!data) return <Screen>{null}</Screen>;
@@ -41,10 +42,7 @@ export default function HabitDetail() {
   const streak = currentStreak(habit, done, today);
   const fire = flameState(streak, done.has(today) || !isDue(habit, today, done));
 
-  const toggleArchive = async () => {
-    await setArchived(db, habit.id, !archived);
-    changed();
-  };
+  const toggleArchive = () => commit(() => setArchived(db, habit.id, !archived));
 
   const confirmDelete = () => {
     alert(t('detail.deleteTitle'), t('detail.deleteBody'), [
@@ -54,9 +52,10 @@ export default function HabitDetail() {
         text: t('common.delete'),
         style: 'destructive',
         onPress: async () => {
-          await deleteHabit(db, habit.id);
-          changed();
-          router.back();
+          if (!(await commit(() => deleteHabit(db, habit.id)))) return;
+          // Opened from a reminder on a cold start, there is nothing to go back to.
+          if (router.canGoBack()) router.back();
+          else router.replace('/');
         },
       },
     ]);

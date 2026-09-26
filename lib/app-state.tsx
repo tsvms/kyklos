@@ -22,6 +22,8 @@ interface AppCtx {
   version: number;
   /** Call after any write: refreshes screens and re-plans reminders. */
   changed: () => void;
+  /** Runs a write, then `changed()`. A failure is reported, never thrown; resolves true on success. */
+  commit: (write: () => Promise<unknown>) => Promise<boolean>;
   /** Today's local date; rolls over at midnight and on returning to the app. */
   today: DateKey;
   /** A short, gentle message shown at the bottom of the screen. */
@@ -35,7 +37,7 @@ const AppContext = createContext<AppCtx | null>(null);
 async function planReminders(db: SQLiteDatabase, t: Translator) {
   try {
     const [habits, checkins] = await Promise.all([listHabits(db), listCheckins(db)]);
-    await syncReminders(habits, groupCheckins(checkins), t);
+    await syncReminders(habits, groupCheckins(checkins, habits), t);
   } catch (e) {
     console.warn('[kyklos] could not plan reminders', e);
   }
@@ -126,9 +128,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
     planReminders(db, t);
   }, [db, t]);
 
+  const commit = useCallback(
+    async (write: () => Promise<unknown>) => {
+      try {
+        await write();
+        changed();
+        return true;
+      } catch (e) {
+        console.warn('[kyklos] write failed', e);
+        notify(t('today.saveFailed'));
+        return false;
+      }
+    },
+    [changed, notify, t],
+  );
+
   const value = useMemo<AppCtx>(
-    () => ({ ready, scheme, colors, themePref, setThemePref, language, setLanguage, t, version, changed, today, toast, notify }),
-    [ready, scheme, colors, themePref, setThemePref, language, setLanguage, t, version, changed, today, toast, notify],
+    () => ({ ready, scheme, colors, themePref, setThemePref, language, setLanguage, t, version, changed, commit, today, toast, notify }),
+    [ready, scheme, colors, themePref, setThemePref, language, setLanguage, t, version, changed, commit, today, toast, notify],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

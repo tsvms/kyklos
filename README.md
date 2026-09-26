@@ -15,7 +15,7 @@ A free, private habit tracker for Android and iOS, with a streak fire and ranks.
 ---
 
 Kyklos is free. It has no accounts, no ads and no tracking, and everything stays on your phone in SQLite.
-It's one Expo codebase (React Native, TypeScript, Expo Router, SDK 57). The name is Kyklos, the slug is `kyklos`, the bundle ID / package is `com.kyklos.app` and the version is 1.0.0.
+It's one Expo codebase (React Native, TypeScript, Expo Router, SDK 57). The name is Kyklos, the slug is `kyklos`, the bundle ID / package is `com.kyklos.app` and the version is 1.1.0.
 
 ## Features
 
@@ -28,6 +28,7 @@ It's one Expo codebase (React Native, TypeScript, Expo Router, SDK 57). The name
 - **Add, edit and delete on the home screen.** Use the ✎ button (edit mode, with a bin on every habit), long-press a habit for its actions, or tap the dashed "Add a habit" card.
 - **Today.** A 7-day strip of mini rings shows each day's progress. Tap a past day to fill in a check-in you forgot. Check-ins give haptics and update instantly.
 - **Schedules.** Every day, X times per week, specific weekdays, or every N days, with an optional local reminder for each habit.
+- **Times a day.** A habit can need several check-ins a day (e.g. 6 glasses of water). Its circle becomes a counter: tap adds one and a ring fills, long-press takes one back. The day counts once the target is reached.
 - **Habit detail.** Streak hero, 30-day rate, total check-ins, a 17-week heatmap, and Edit / Archive (keeps the history) / Delete.
 - **Stats.** Day streak, best streak, this week, 30-day rate, 8 weekly bars, the fire for each habit, and the rank ladder.
 - **Settings.**
@@ -155,12 +156,11 @@ eas build -p android --profile preview
 - The build runs in the cloud (roughly 10–20 min on the free tier). At the end you get a **link and a QR code**.
 - Open the link on the phone, download the `.apk` and open it. Android asks you to allow "Install unknown apps" for your browser or file manager. Allow it once.
 
-`--profile preview-android` builds the same APK. It exists as its own named profile.
 
 ## 5. Android: Play Store bundle (AAB)
 
 ```bash
-eas build -p android --profile production-android
+eas build -p android --profile production
 ```
 
 This produces an `.aab`, with `versionCode` auto-incremented by EAS. To publish:
@@ -192,7 +192,7 @@ Answer the prompts:
 2. **Register bundle identifier / generate a Distribution Certificate / generate a Provisioning Profile:** answer **Yes** to each. EAS creates and stores them.
 3. **Push notifications key:** you can answer **No**. Kyklos uses local notifications only.
 
-This builds a store-signed `.ipa`, which is what TestFlight needs. `--profile preview-ios` is an identical, separately named profile.
+This builds a store-signed `.ipa`, which is what TestFlight needs.
 
 ### Create the app in App Store Connect (every click)
 
@@ -233,8 +233,8 @@ Later versions: run `eas build -p ios --profile preview`, then `eas submit -p io
 **Android 12+ reminders arrive late or not at the exact minute.**
 Since Android 12, exact alarms need `SCHEDULE_EXACT_ALARM`, and on Android 14+ it is *off by default* for newly installed apps. Kyklos still schedules its reminders, but Android may deliver them a few minutes late. To make them exact, go to **Settings → Apps → Kyklos → Alarms & reminders → Allow**. Also, on Samsung, Xiaomi, Huawei and similar phones, set **Battery → Unrestricted** for Kyklos, because aggressive battery savers can delay or drop notifications. After a phone reboot, the notification library restores scheduled reminders by itself (that's what `RECEIVE_BOOT_COMPLETED` is for), and Kyklos also re-plans everything each time it opens.
 
-**Play Store rejects `USE_EXACT_ALARM`.**
-Google Play restricts `USE_EXACT_ALARM` to alarm-clock and calendar apps. The permission is included because the spec requires it, but a Play review may object. If that happens, delete that one line from `android.permissions` in `app.json` and rebuild. `SCHEDULE_EXACT_ALARM` alone is enough.
+**Why there is no `USE_EXACT_ALARM`.**
+Google Play restricts `USE_EXACT_ALARM` to alarm-clock and calendar apps, so `app.json` blocks it. `SCHEDULE_EXACT_ALARM` alone is enough.
 
 **How reminders are planned.**
 Kyklos schedules each reminder as a concrete date up to 14 days ahead. It re-plans on every launch and after every change. This is how it skips a day you've already completed, stops a weekly habit once you hit the target, and supports "every N days". If you don't open Kyklos for two weeks, reminders pause on purpose: a quiet app shouldn't nag a habit you've set aside. Opening the app resumes them.
@@ -286,11 +286,8 @@ Run `npx expo-doctor`; every check should pass.
 | --- | --- | --- |
 | `development` | dev-client APK | dev-client (internal, registered devices) |
 | `preview` | **APK**, internal link / QR | **store-signed IPA** for TestFlight |
-| `preview-android` | APK, internal link / QR | — |
-| `production-android` | **AAB** for Play Store | — |
-| `preview-ios` | — | store-signed IPA for TestFlight |
-| `production` | AAB | store-signed IPA |
+| `production` | **AAB** for Play Store | store-signed IPA |
 
 **Data.** SQLite (`kyklos.db`) holds the `habits`, `checkins` and a small `settings` table (theme, language). Dates are local `YYYY-MM-DD` strings, so a check-in belongs to the calendar day you made it on. Reminders are rebuilt from the database on every launch and after every change, so killing and reopening the app keeps both data and reminders.
 
-**Permissions.** Android declares `RECEIVE_BOOT_COMPLETED`, `SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM` and `VIBRATE`, and blocks storage, camera, microphone and overlay permissions. Two more end up in the final manifest on purpose. `INTERNET` comes from the React Native template and the development build needs it to reach Metro. `POST_NOTIFICATIONS` is merged by `expo-notifications`, and without it Android 13+ can't show notifications.
+**Permissions.** Android declares `RECEIVE_BOOT_COMPLETED`, `SCHEDULE_EXACT_ALARM` and `VIBRATE`, and blocks `USE_EXACT_ALARM` plus storage, camera, microphone and overlay permissions. Two more end up in the final manifest on purpose. `INTERNET` comes from the React Native template and the development build needs it to reach Metro. `POST_NOTIFICATIONS` is merged by `expo-notifications`, and without it Android 13+ can't show notifications.

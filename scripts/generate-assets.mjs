@@ -5,7 +5,6 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import { deflateSync } from 'node:zlib';
 
 const PAPER = [0xf6, 0xf3, 0xee, 255];
-const CHARCOAL = [0x0e, 0x0c, 0x0b, 255];
 const TERRACOTTA = [0xe0, 0x59, 0x2f, 255];
 const TERRACOTTA_DARK = [0xff, 0x70, 0x43, 255];
 const WHITE = [255, 255, 255, 255];
@@ -121,5 +120,3 @@ out('splash-icon-dark.png', { size: 512, bg: CLEAR, fg: TERRACOTTA_DARK, ringDia
 // Android status-bar icon: 96×96 white on transparent, slightly heavier stroke.
 out('notification-icon.png', { size: 96, bg: CLEAR, fg: WHITE, ringDiameter: 0.8, strokeRatio: 0.18 });
 out('favicon.png', { size: 48, bg: PAPER, fg: TERRACOTTA, ringDiameter: 0.7, strokeRatio: 0.18 });
-// Store listing preview on charcoal (not referenced by app.json).
-out('icon-dark-preview.png', { size: 512, bg: CHARCOAL, fg: TERRACOTTA_DARK, ringDiameter: 0.56 });

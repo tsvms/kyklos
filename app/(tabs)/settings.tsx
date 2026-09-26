@@ -21,7 +21,7 @@ const APP_VERSION = Constants.expoConfig?.version ?? '1.0.0';
 
 export default function Settings() {
   const db = useSQLiteContext();
-  const { colors, t, themePref, setThemePref, language, setLanguage, changed, today, notify } = useApp();
+  const { colors, t, themePref, setThemePref, language, setLanguage, changed, commit, today, notify } = useApp();
   const [permission, setPermission] = useState<PermissionState>('unavailable');
   const [busy, setBusy] = useState(false);
 
@@ -85,9 +85,7 @@ export default function Settings() {
             text: t('settings.importConfirm'),
             style: 'destructive',
             onPress: async () => {
-              await restoreBackup(db, backup);
-              changed();
-              notify(t('settings.importDone'));
+              if (await commit(() => restoreBackup(db, backup))) notify(t('settings.importDone'));
             },
           },
         ],
@@ -107,9 +105,7 @@ export default function Settings() {
         text: t('settings.deleteAllConfirm'),
         style: 'destructive',
         onPress: async () => {
-          await deleteAllData(db);
-          changed();
-          notify(t('settings.deleted'));
+          if (await commit(() => deleteAllData(db))) notify(t('settings.deleted'));
         },
       },
     ]);
